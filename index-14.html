@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ferme Avicole Racine</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1b4332">
+<style>
+  :root{
+    --vert:#2d6a4f; --vert-fonce:#1b4332; --vert-clair:#95d5b2;
+    --orange:#e76f51; --fond:#f8f9fa; --carte:#ffffff; --texte:#212529;
+    --gris:#6c757d; --danger:#d62828; --alerte:#f77f00; --bleu:#264653;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,Segoe UI,Roboto,sans-serif; background:var(--fond); color:var(--texte); padding-bottom:70px;}
+  header{background:var(--vert-fonce); color:#fff; padding:14px 16px; text-align:center; position:sticky; top:0; z-index:10;}
+  header h1{font-size:1.15rem;}
+  header p{font-size:0.72rem; opacity:0.85; margin-top:2px;}
+  .user-badge{position:absolute; top:12px; right:12px; font-size:0.65rem; background:rgba(255,255,255,0.15); padding:4px 8px; border-radius:8px;}
+  .container{padding:12px; max-width:640px; margin:0 auto;}
+  .cards{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
+  .card{background:var(--carte); border-radius:10px; padding:12px; box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+  .card .label{font-size:0.68rem; color:var(--gris); text-transform:uppercase;}
+  .card .value{font-size:1.3rem; font-weight:700; color:var(--vert-fonce); margin-top:4px;}
+  .card.orange .value{color:var(--orange);}
+  .card.danger .value{color:var(--danger);}
+  .section-title{font-size:1rem; font-weight:700; margin:16px 0 8px; color:var(--vert-fonce); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;}
+  .btn{background:var(--vert); color:#fff; border:none; padding:10px 14px; border-radius:8px; font-size:0.85rem; font-weight:600;}
+  .btn.small{padding:6px 10px; font-size:0.75rem;}
+  .btn.outline{background:none; border:1.5px solid var(--vert); color:var(--vert);}
+  .btn.danger{background:var(--danger);}
+  .btn.bleu{background:var(--bleu);}
+  .lot-card{background:var(--carte); border-radius:10px; padding:12px; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,0.08); border-left:4px solid var(--vert-clair);}
+  .lot-card.local{border-left-color:var(--orange);}
+  .lot-header{display:flex; justify-content:space-between; align-items:flex-start;}
+  .lot-header .badge{font-size:0.65rem; padding:2px 8px; border-radius:10px; background:var(--vert-clair); color:var(--vert-fonce); font-weight:700;}
+  .badge.local{background:#fde0d0; color:var(--orange);}
+  .lot-meta{font-size:0.78rem; color:var(--gris); margin-top:6px; line-height:1.5;}
+  .stage-bar{height:6px; background:#e9ecef; border-radius:3px; margin-top:8px; overflow:hidden;}
+  .stage-fill{height:100%; background:var(--vert);}
+  .lot-actions{display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;}
+  .tabs{position:fixed; bottom:0; left:0; right:0; background:#fff; display:flex; overflow-x:auto; box-shadow:0 -2px 6px rgba(0,0,0,0.1); z-index:10;}
+  .tab{flex:1 0 auto; min-width:58px; text-align:center; padding:9px 2px; font-size:0.62rem; color:var(--gris); border:none; background:none;}
+  .tab.active{color:var(--vert-fonce); font-weight:700;}
+  .tab .icon{font-size:1.1rem; display:block;}
+  .view{display:none;}
+  .view.active{display:block;}
+  .modal-bg{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:20; align-items:flex-end;}
+  .modal-bg.active{display:flex;}
+  .modal{background:#fff; width:100%; max-height:88vh; overflow-y:auto; border-radius:16px 16px 0 0; padding:18px;}
+  .modal h3{margin-bottom:12px; color:var(--vert-fonce);}
+  .field{margin-bottom:12px;}
+  .field label{font-size:0.78rem; color:var(--gris); display:block; margin-bottom:4px;}
+  .field input, .field select, .field textarea{width:100%; padding:9px; border:1px solid #ced4da; border-radius:7px; font-size:0.9rem;}
+  .modal-actions{display:flex; gap:8px; margin-top:14px;}
+  .modal-actions .btn{flex:1;}
+  .info-card{background:var(--carte); border-radius:10px; padding:12px; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+  .info-card h4{color:var(--danger); font-size:0.95rem; margin-bottom:6px;}
+  .info-card.natural h4{color:var(--vert-fonce);}
+  .info-card .dsec{margin-top:6px;}
+  .info-card .dsec .dlabel{font-size:0.7rem; font-weight:700; color:var(--vert-fonce); text-transform:uppercase;}
+  .info-card.natural .dsec .dlabel{color:var(--orange);}
+  .info-card .dsec p{font-size:0.82rem; margin-top:2px; line-height:1.4;}
+  .empty{text-align:center; color:var(--gris); padding:30px 10px; font-size:0.85rem;}
+  .list-item{background:var(--carte); border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+  .list-item .li-main{font-size:0.85rem;}
+  .list-item .li-sub{font-size:0.7rem; color:var(--gris);}
+  .list-item .li-val{font-weight:700; font-size:0.9rem;}
+  .fab{position:fixed; bottom:78px; right:16px; background:var(--vert); color:#fff; width:52px; height:52px; border-radius:50%; border:none; font-size:1.6rem; box-shadow:0 3px 8px rgba(0,0,0,0.25); z-index:9;}
+  .install-banner{background:#fff3cd; color:#664d03; padding:8px 12px; font-size:0.75rem; text-align:center; display:none;}
+  .chart-box{background:var(--carte); border-radius:10px; padding:10px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+  .chart-box .ctitle{font-size:0.82rem; font-weight:700; color:var(--vert-fonce); margin-bottom:6px;}
+  .settings-group{background:var(--carte); border-radius:10px; padding:12px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+  .settings-group h4{font-size:0.85rem; color:var(--vert-fonce); margin-bottom:10px;}
+  .race-tag{display:inline-flex; align-items:center; gap:6px; background:#e9ecef; padding:4px 10px; border-radius:14px; font-size:0.75rem; margin:3px 4px 0 0;}
+  .race-tag button{border:none; background:none; color:var(--danger); font-weight:700; cursor:pointer;}
+  #loginScreen{position:fixed; inset:0; background:var(--vert-fonce); z-index:50; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#fff; padding:20px;}
+  #loginScreen h2{margin-bottom:6px;}
+  #loginScreen p{font-size:0.8rem; opacity:0.85; margin-bottom:20px; text-align:center;}
+  #loginScreen input{width:220px; padding:12px; border-radius:8px; border:none; text-align:center; font-size:1.3rem; letter-spacing:6px; margin-bottom:12px;}
+  #loginScreen .role-select{display:flex; gap:8px; margin-bottom:16px;}
+  #loginScreen .role-select button{padding:8px 16px; border-radius:20px; border:1.5px solid #fff; background:none; color:#fff; font-size:0.8rem;}
+  #loginScreen .role-select button.selected{background:#fff; color:var(--vert-fonce); font-weight:700;}
+  #loginErr{color:#ffb4a2; font-size:0.75rem; height:16px; margin-bottom:6px;}
+  .hidden{display:none !important;}
+  @media print{
+    .tabs, .fab, header .user-badge, .install-banner, .modal-bg { display:none !important; }
+    body{padding-bottom:0;}
+    .view{display:block !important;}
+    .view:not(#view-reports){display:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <h2>🐔 Ferme Avicole Racine</h2>
+  <p>Connexion sécurisée par code PIN</p>
+  <div class="role-select">
+    <button id="roleBtnPatron" class="selected" onclick="selectRole('patron')">Patron</button>
+    <button id="roleBtnGerant" onclick="selectRole('gerant')">Gérant</button>
+  </div>
+  <input type="password" inputmode="numeric" maxlength="6" id="pinInput" placeholder="••••">
+  <div id="loginErr"></div>
+  <button class="btn" onclick="tryLogin()">Se connecter</button>
+  <button style="background:none; border:none; color:#ffe8d6; font-size:0.75rem; margin-top:14px; text-decoration:underline;" onclick="openRecovery()">PIN oublié ?</button>
+</div>
+
+<!-- MODAL RECOVERY -->
+<div class="modal-bg" id="modalRecovery">
+  <div class="modal">
+    <h3>🔑 Récupération de PIN</h3>
+    <div id="recoveryStep1">
+      <p style="font-size:0.85rem; color:var(--gris); margin-bottom:10px;" id="recoveryQuestionText"></p>
+      <div class="field"><label>Ta réponse</label><input type="text" id="recoveryAnswer"></div>
+      <div id="recoveryErr" style="color:var(--danger); font-size:0.78rem; margin-bottom:8px;"></div>
+      <div class="modal-actions">
+        <button class="btn outline" onclick="closeModal('modalRecovery')">Annuler</button>
+        <button class="btn" onclick="checkRecovery()">Valider</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<header>
+  <h1>🐔 Ferme Avicole Racine</h1>
+  <p>Gestion complète — savoirs endogènes &amp; indépendance totale</p>
+  <div class="user-badge" id="userBadge"></div>
+</header>
+<div class="install-banner" id="installBanner">📲 Ajoute cette appli à ton écran d'accueil pour l'utiliser hors-ligne.</div>
+
+<div class="container">
+
+  <!-- TABLEAU DE BORD -->
+  <div class="view active" id="view-dashboard">
+    <div class="cards">
+      <div class="card"><div class="label">Poussins vivants</div><div class="value" id="dashVivants">0</div></div>
+      <div class="card danger"><div class="label">Mortalité totale</div><div class="value" id="dashMortalite">0</div></div>
+      <div class="card orange"><div class="label">Revenu total</div><div class="value" id="dashRevenu">0</div></div>
+      <div class="card fin-only"><div class="label">Marge estimée</div><div class="value" id="dashMarge">0</div></div>
+    </div>
+    <div class="section-title">Lots en cours</div>
+    <div id="vaccineAlerts"></div>
+    <div id="dashLots"></div>
+  </div>
+
+  <!-- LOTS -->
+  <div class="view" id="view-lots">
+    <div class="section-title">Mes lots <button class="btn small" onclick="openLotModal()">+ Nouveau lot</button></div>
+    <div id="lotsList"></div>
+  </div>
+
+  <!-- ALIMENTATION -->
+  <div class="view" id="view-feed">
+    <div class="cards">
+      <div class="card"><div class="label">Stock aliment (kg)</div><div class="value" id="feedStock">0</div></div>
+      <div class="card orange fin-only"><div class="label">Dépense totale</div><div class="value" id="feedCost">0</div></div>
+    </div>
+    <div class="section-title">Mouvements <button class="btn small" onclick="openFeedModal()">+ Ajouter</button></div>
+    <div id="feedList"></div>
+  </div>
+
+  <!-- SANTÉ -->
+  <div class="view" id="view-health">
+    <div class="section-title">Carnet sanitaire <button class="btn small" onclick="openHealthModal()">+ Ajouter</button></div>
+    <div id="healthList"></div>
+    <div class="section-title" style="margin-top:22px;">⚠️ Guide des maladies courantes</div>
+    <div id="diseaseGuide"></div>
+  </div>
+
+  <!-- NATUREL -->
+  <div class="view" id="view-natural">
+    <div class="section-title">🌿 Aliments naturels faits maison</div>
+    <div id="naturalFeeds"></div>
+    <div class="section-title" style="margin-top:22px;">🍃 Soins &amp; remèdes traditionnels</div>
+    <div id="naturalRemedies"></div>
+    <div class="section-title" style="margin-top:22px;">💡 Élevage indépendant — repères</div>
+    <div id="naturalTips"></div>
+  </div>
+
+  <!-- ENCYCLOPÉDIE -->
+  <div class="view" id="view-encyclo">
+    <div class="section-title">📖 Encyclopédie de l'aviculture</div>
+    <div style="display:flex; gap:8px; margin-bottom:10px;">
+      <button class="btn small" id="levelBtnDebutant" onclick="setEncycloLevel('debutant')">🌱 Débutant</button>
+      <button class="btn small outline" id="levelBtnExpert" onclick="setEncycloLevel('expert')">🎓 Expert</button>
+    </div>
+    <div class="field"><input type="text" id="encycloSearch" placeholder="🔎 Rechercher un mot-clé (ex: coccidiose, FCR, incubation...)" oninput="renderEncyclo()"></div>
+    <div id="encycloContent"></div>
+  </div>
+
+  <!-- GUIDE PRO -->
+  <div class="view" id="view-bestpractices">
+    <div class="section-title">📚 Kuroiler vs Poulet local — comparatif</div>
+    <div id="bpCompare"></div>
+    <div class="section-title" style="margin-top:20px;">✅ Meilleures pratiques par étape</div>
+    <div id="bpStages"></div>
+    <div class="section-title" style="margin-top:20px;">🏗️ Logement &amp; densité</div>
+    <div id="bpHousing"></div>
+    <div class="section-title" style="margin-top:20px;">🧬 Reproduction &amp; sélection</div>
+    <div id="bpBreeding"></div>
+    <div class="section-title" style="margin-top:20px;">💧 Eau &amp; hygiène</div>
+    <div id="bpHygiene"></div>
+    <div class="section-title" style="margin-top:20px;">📦 Commercialisation</div>
+    <div id="bpSales"></div>
+  </div>
+
+  <!-- VENTES -->
+  <div class="view" id="view-sales">
+    <div class="cards">
+      <div class="card"><div class="label">Total vendu</div><div class="value" id="salesQty">0</div></div>
+      <div class="card orange"><div class="label">Revenu total</div><div class="value" id="salesRevenu">0</div></div>
+    </div>
+    <div class="section-title">🥚 Ponte quotidienne <button class="btn small" onclick="openEggModal()">+ Enregistrer</button></div>
+    <div class="cards">
+      <div class="card"><div class="label">Œufs en stock</div><div class="value" id="eggStock">0</div></div>
+      <div class="card"><div class="label">Taux de ponte (7j)</div><div class="value" id="eggRate">0%</div></div>
+    </div>
+    <div id="eggList"></div>
+    <div class="section-title" style="margin-top:16px;">👥 Clients <button class="btn small" onclick="openClientModal()">+ Client</button></div>
+    <div id="clientsList"></div>
+    <div class="section-title" style="margin-top:16px;">Ventes <input type="text" id="salesSearch" placeholder="🔎 Filtrer..." style="width:130px; padding:6px; border:1px solid #ced4da; border-radius:6px; font-size:0.78rem;" oninput="renderSales()"> <button class="btn small" onclick="openSaleModal()">+ Vente</button></div>
+    <div id="salesList"></div>
+  </div>
+
+  <!-- RAPPORTS -->
+  <div class="view fin-only" id="view-reports">
+    <div class="section-title">🧮 Coût de revient &amp; prix de vente</div>
+    <div class="settings-group">
+      <div class="field"><label>Choisir un lot</label><select id="calcLot" onchange="renderCoutRevient()"></select></div>
+      <div id="coutRevientDetail"></div>
+      <div class="field" style="margin-top:10px;"><label>Marge souhaitée (%)</label>
+        <input type="number" id="calcMarge" value="30" oninput="renderCoutRevient()">
+      </div>
+      <div id="prixSuggere"></div>
+    </div>
+    <div class="section-title">📈 Croissance par lot <button class="btn small" onclick="openWeightModal()">+ Peser un lot</button></div>
+    <div id="growthCharts"></div>
+    <div class="section-title" style="margin-top:20px;">💹 Rentabilité par lot</div>
+    <div id="profitChart"></div>
+    <div class="section-title" style="margin-top:20px;">📄 Rapport imprimable</div>
+    <div class="settings-group">
+      <p style="font-size:0.78rem; color:var(--gris); margin-bottom:8px;">Génère une vue simplifiée à imprimer ou enregistrer en PDF (utile pour une banque ou un partenaire).</p>
+      <button class="btn small bleu" onclick="window.print()">🖨️ Imprimer / Exporter en PDF</button>
+    </div>
+    <div class="section-title" style="margin-top:20px;">📤 Export &amp; sauvegarde</div>
+    <div class="settings-group">
+      <h4>Exporter en CSV</h4>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn small outline" onclick="exportCSV('lots')">Lots</button>
+        <button class="btn small outline" onclick="exportCSV('feed')">Aliment</button>
+        <button class="btn small outline" onclick="exportCSV('health')">Santé</button>
+        <button class="btn small outline" onclick="exportCSV('sales')">Ventes</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <h4>Sauvegarde complète (JSON)</h4>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn small bleu" onclick="exportBackup()">💾 Télécharger la sauvegarde</button>
+        <button class="btn small outline" onclick="document.getElementById('restoreFile').click()">📂 Restaurer</button>
+      </div>
+      <input type="file" id="restoreFile" accept=".json" class="hidden" onchange="restoreBackup(event)">
+    </div>
+  </div>
+
+  <!-- PARAMÈTRES -->
+  <div class="view fin-only" id="view-settings">
+    <div class="settings-group">
+      <h4>Informations de la ferme</h4>
+      <div class="field"><label>Nom de la ferme</label><input type="text" id="setFarmName"></div>
+      <div class="field"><label>Devise</label><input type="text" id="setCurrency" placeholder="FCFA"></div>
+      <button class="btn small" onclick="saveSettings()">Enregistrer</button>
+    </div>
+    <div class="settings-group">
+      <h4>Prix par défaut ({{devise}})</h4>
+      <div class="field"><label>Prix poussin (par tête)</label><input type="number" id="setPrixPoussin"></div>
+      <div class="field"><label>Prix aliment (par kg)</label><input type="number" id="setPrixAliment"></div>
+      <div class="field"><label>Prix vente poulet vivant</label><input type="number" id="setPrixVentePoulet"></div>
+      <div class="field"><label>Prix vente œuf</label><input type="number" id="setPrixOeuf"></div>
+      <div class="field"><label>Marge bénéficiaire par défaut (%)</label><input type="number" id="setMargeDefaut" placeholder="Ex: 30"></div>
+      <button class="btn small" onclick="saveSettings()">Enregistrer</button>
+    </div>
+    <div class="settings-group">
+      <h4>Races personnalisées</h4>
+      <div id="raceTags"></div>
+      <div class="field" style="margin-top:10px;"><label>Ajouter une race</label>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="newRaceName" placeholder="Ex: Poulet Bicyclette">
+          <button class="btn small" onclick="addRace()">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="settings-group">
+      <h4>Codes PIN des utilisateurs</h4>
+      <div class="field"><label>PIN Patron (accès total)</label><input type="password" inputmode="numeric" maxlength="6" id="setPinPatron"></div>
+      <div class="field"><label>PIN Gérant (saisie quotidienne seulement)</label><input type="password" inputmode="numeric" maxlength="6" id="setPinGerant"></div>
+      <button class="btn small" onclick="savePins()">Mettre à jour les PIN</button>
+    </div>
+    <div class="settings-group">
+      <h4>🔑 Récupération de PIN (en cas d'oubli)</h4>
+      <div class="field"><label>Question de secours</label><input type="text" id="setSecQuestion" placeholder="Ex: Nom de mon premier fournisseur ?"></div>
+      <div class="field"><label>Réponse de secours</label><input type="text" id="setSecAnswer" placeholder="Réponse (sensible à la casse ignorée)"></div>
+      <button class="btn small" onclick="saveSecurityQA()">Enregistrer la question de secours</button>
+    </div>
+    <div class="settings-group">
+      <h4>📋 Historique des actions (traçabilité Patron/Gérant)</h4>
+      <div id="actionsLog" style="max-height:220px; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+</div>
+
+<button class="fab" id="fabBtn" onclick="fabAction()">+</button>
+
+<div class="tabs" id="tabsBar">
+  <button class="tab active" data-view="dashboard" onclick="switchTab('dashboard')"><span class="icon">📊</span>Accueil</button>
+  <button class="tab" data-view="lots" onclick="switchTab('lots')"><span class="icon">🐥</span>Lots</button>
+  <button class="tab" data-view="feed" onclick="switchTab('feed')"><span class="icon">🌾</span>Aliment</button>
+  <button class="tab" data-view="health" onclick="switchTab('health')"><span class="icon">💊</span>Santé</button>
+  <button class="tab" data-view="natural" onclick="switchTab('natural')"><span class="icon">🌿</span>Naturel</button>
+  <button class="tab" data-view="bestpractices" onclick="switchTab('bestpractices')"><span class="icon">📚</span>Guide Pro</button>
+  <button class="tab" data-view="sales" onclick="switchTab('sales')"><span class="icon">💰</span>Ventes</button>
+  <button class="tab" data-view="encyclo" onclick="switchTab('encyclo')"><span class="icon">📖</span>Encyclo</button>
+  <button class="tab fin-only" data-view="reports" onclick="switchTab('reports')"><span class="icon">📈</span>Rapports</button>
+  <button class="tab fin-only" data-view="settings" onclick="switchTab('settings')"><span class="icon">⚙️</span>Réglages</button>
+</div>
+
+<!-- MODAL LOT -->
+<div class="modal-bg" id="modalLot">
+  <div class="modal">
+    <h3>Nouveau lot</h3>
+    <div style="background:#e8f3ee; border-radius:8px; padding:8px 10px; font-size:0.75rem; color:#1b4332; margin-bottom:10px;">
+      💡 Débutant ? Commence avec 10-20 têtes pour ton premier lot. Vérifie que les poussins ont les yeux vifs et les pattes droites avant l'achat.
+    </div>
+    <div class="field"><label>Race</label><select id="lotType"></select></div>
+    <div class="field"><label>Origine</label>
+      <select id="lotSource"><option value="poussins">Poussins achetés</option><option value="oeufs">Œufs (incubation/couvaison)</option></select>
+    </div>
+    <div class="field"><label>Date d'arrivée / mise en incubation</label><input type="date" id="lotDate"></div>
+    <div class="field"><label>Quantité initiale</label><input type="number" id="lotQty" placeholder="Ex: 50"></div>
+    <div class="field"><label>Coût unitaire</label><input type="number" id="lotCout" placeholder="Ex: 500"></div>
+    <div class="field"><label>Fournisseur</label><input type="text" id="lotFournisseur" placeholder="Nom / lieu"></div>
+    <div class="field"><label>Notes</label><textarea id="lotNotes" rows="2"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closeModal('modalLot')">Annuler</button>
+      <button class="btn" onclick="saveLot()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MORTALITE -->
+<div class="modal-bg" id="modalUpdate">
+  <div class="modal">
+    <h3>Mettre à jour le lot</h3>
+    <div style="background:#fff3cd; border-radius:8px; padding:8px 10px; font-size:0.75rem; color:#664d03; margin-bottom:10px;">
+      ⚠️ Si plusieurs sujets meurent en même temps (pas un cas isolé), isole immédiatement les survivants malades et consulte le guide des maladies (onglet Santé) — n'attends pas pour agir.
+    </div>
+    <input type="hidden" id="updLotId">
+    <div class="field"><label>Nombre de morts à retirer</label><input type="number" id="updMorts" placeholder="0"></div>
+    <div class="field"><label>Raison</label><input type="text" id="updRaison" placeholder="Ex: maladie, prédateur..."></div>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closeModal('modalUpdate')">Annuler</button>
+      <button class="btn danger" onclick="saveMortalite()">Enregistrer mortalité</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PESÉE -->
+<div class="modal-bg" id="modalWeight">
+  <div class="modal">
+    <h3>Enregistrer une pesée</h3>
+    <div class="field"><label>Lot concerné</label><select id="weightLot"></select></div>
+    <div class="field"><label>Date</label><input type="date" id="weightDate"></div>
+    <div class="field"><label>Poids moyen (g)</label><input type="number" id="weightVal" placeholder="Ex: 850"></div>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closeModal('modalWeight')">Annuler</button>
+      <button class="btn" onclick="saveWeight()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FEED -->
+<div class="modal-bg" id="modalFeed">
+  <div class="modal">
+    <h3>Mouvement d'aliment</h3>
+    <div class="field"><label>Type</label>
+      <select id="feedTypeSel"><option value="entree">Entrée (achat)</option><option value="sortie">Sortie (distribution)</option></select>
+    </div>
+    <div class="field"><label>Lot concerné (si distribution à un lot précis)</label>
+      <select id="feedLot"><option value="">— Stock général / non attribué —</option></select>
+    </div>
+    <div class="field"><label>Date</label><input type="date" id="feedDate"></div>
+    <div class="field"><label>Quantité (kg)</label><input type="number" id="feedQty" placeholder="Ex: 25"></div>
+    <div class="field"><label>Coût total — si entrée</label><input type="number" id="feedCoutInput" placeholder="Ex: 12500"></div>
+    <div class="field"><label>Notes</label><input type="text" id="feedNotes"></div>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closeModal('modalFeed')">Annuler</button>
+      <button class="btn" onclick="saveFeed()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HEALTH -->
+<div class="modal-bg" id="modalHealth">
+  <div class="modal">
+    <h3>Ajouter au carnet sanitaire</h3>
+    <div class="field"><label>Lot concerné</label><select id="healthLot"></select></div>
+    <div class="field"><label>Type</label>
+      <select id="healthType"><option value="vaccin">Vaccination</option><option value="traitement">Traitement</option><option value="naturel">Soin naturel</option><option value="maladie">Maladie observée</option></select>
+    </div>
+    <div class="field"><label>Date</label><input type="date" id="healthDate"></div>
+    <div class="field"><label>Description</label><input type="text" id="healthDesc" placeholder="Ex: Vaccin Newcastle, ail pilé..."></div>
+    <div class="field"><label>Coût (optionnel, pour le calcul du prix de revient)</label><input type="number" id="healthCout" placeholder="Ex: 2000"></div>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closeModal('modalHealth')">Annuler</button>
+      <button class="btn" onclick="saveHealth()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SALE -->
+<div class="modal-bg" id="modalSale">
+  <div class="modal">
+    <h3>Nouvelle vente</h3>
+    <div style="background:#e8f3ee; border-radius:8px; padding:8px 10px; font-size:0.75rem; color:#1b4332; margin-bottom:10px;">
+      💡 Le prix se pré-remplit avec ton prix de revient + marge en temps réel dès que tu choisis le lot — vérifie-le avant de négocier plus bas.
+    </div>
+    <div class="field"><label>Lot concerné</label><select id="saleLot"></select></div>
+    <div class="field"><label>Type de vente</label>
+      <select id="saleType"><option value="poulet">Poulet vivant</option><option value="oeufs">Œufs</option></select>
+    </div>
+    <div class="field"><label>Date</label><input type="date" id="saleDate"></div>
+    <div class="field"><label>Quantité</label><input type="number" id="saleQty" placeholder="Ex: 10"></div>
+    <div class="field"><label>Prix unitaire</label><input type="number" id="salePrix" placeholder="Ex: 3500"></div>
+    <div class="field"><label>Client (optionnel)</label>
+      <select id="saleClient"><option value="">— Client de passage —</option></select>
+    </div>
+    <div class="field"><label>Statut de paiement</label>
+      <select id="salePaye"><option value="paye">Payé intégralement</option><option value="credit">Vente à crédit</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closeModal('modalSale')">Annuler</button>
+      <button class="btn" onclick="saveSale()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EGG -->
+<div class="modal-bg" id="modalEgg">
+  <div class="modal">
+    <h3>Enregistrer la ponte du jour</h3>
+    <div class="field"><label>Lot concerné (pondeuses)</label><select id="eggLot"></select></div>
+    <div class="field"><label>Date</label><input type="date" id="eggDate"></div>
+    <div class="field"><label>Nombre d'œufs pondus</label><input type="number" id="eggQty" placeholder="Ex: 18"></div>
+    <div class="field"><label>Œufs cassés/perdus</label><input type="number" id="eggLoss" placeholder="0"></div>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closeModal('modalEgg')">Annuler</button>
+      <button class="btn" onclick="saveEgg()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CLIENT -->
+<div class="modal-bg" id="modalClient">
+  <div class="modal">
+    <h3>Nouveau client</h3>
+    <div class="field"><label>Nom</label><input type="text" id="clientNom" placeholder="Ex: Mme Sawadogo"></div>
+    <div class="field"><label>Téléphone</label><input type="text" id="clientTel" placeholder="Ex: 70 00 00 00"></div>
+    <div class="field"><label>Notes</label><input type="text" id="clientNotes" placeholder="Ex: restaurant, quartier..."></div>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closeModal('modalClient')">Annuler</button>
+      <button class="btn" onclick="saveClient()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PAIEMENT CRÉDIT -->
+<div class="modal-bg" id="modalPayCredit">
+  <div class="modal">
+    <h3>Enregistrer un paiement</h3>
+    <input type="hidden" id="payClientId">
+    <div class="field"><label>Montant reçu</label><input type="number" id="payAmount" placeholder="Ex: 5000"></div>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closeModal('modalPayCredit')">Annuler</button>
+      <button class="btn" onclick="savePayment()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== STOCKAGE ====================
+const DB = {
+  get(key, def){ try{ const v = JSON.parse(localStorage.getItem(key)); return v===null||v===undefined ? def : v; }catch(e){ return def; } },
+  set(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+};
+const KEYS = { lots:'ea_lots', feed:'ea_feed', health:'ea_health', sales:'ea_sales', settings:'ea_settings', users:'ea_users', weights:'ea_weights', clients:'ea_clients', eggs:'ea_eggs', actions:'ea_actions', payments:'ea_payments' };
+
+let lots = DB.get(KEYS.lots, []);
+let feed = DB.get(KEYS.feed, []);
+let health = DB.get(KEYS.health, []);
+let sales = DB.get(KEYS.sales, []);
+let weights = DB.get(KEYS.weights, []);
+let clients = DB.get(KEYS.clients, []);
+let eggs = DB.get(KEYS.eggs, []);
+let actions = DB.get(KEYS.actions, []);
+let payments = DB.get(KEYS.payments, []);
+let settings = DB.get(KEYS.settings, {
+  farmName:"Ferme Avicole Racine", currency:"FCFA",
+  prixPoussin:500, prixAliment:500, prixVentePoulet:3500, prixOeuf:150,
+  races:["Kuroiler","Poulet local","Poulet du Faso","Dindon","Pintade"], secQuestion:"", secAnswer:"", lastBackup:null, margeDefaut:30
+});
+function logAction(desc){
+  actions.push({id:uid(), date:new Date().toISOString(), role:currentRole||'?', desc});
+  if(actions.length>300) actions = actions.slice(-300);
+  DB.set(KEYS.actions, actions);
+}
+let users = DB.get(KEYS.users, { patron:"1234", gerant:"0000" });
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function fmt(n){ return Math.round(n||0).toLocaleString('fr-FR'); }
+function ageJours(dateStr){ return Math.floor((new Date() - new Date(dateStr))/(1000*60*60*24)); }
+function devise(){ return settings.currency || 'FCFA'; }
+
+// ==================== LOGIN ====================
+let selectedRole = 'patron';
+let currentRole = null;
+function selectRole(r){
+  selectedRole = r;
+  document.getElementById('roleBtnPatron').classList.toggle('selected', r==='patron');
+  document.getElementById('roleBtnGerant').classList.toggle('selected', r==='gerant');
+}
+function tryLogin(){
+  const pin = document.getElementById('pinInput').value;
+  const expected = selectedRole==='patron' ? users.patron : users.gerant;
+  if(pin === expected){
+    currentRole = selectedRole;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('userBadge').textContent = currentRole==='patron' ? '👤 Patron' : '👤 Gérant';
+    applyRoleRestrictions();
+    logAction('Connexion ('+currentRole+')');
+    checkBackupReminder();
+    renderAll();
+  } else {
+    document.getElementById('loginErr').textContent = 'Code PIN incorrect.';
+  }
+}
+function applyRoleRestrictions(){
+  const isGerant = currentRole === 'gerant';
+  document.querySelectorAll('.fin-only').forEach(el=>{ el.style.display = isGerant ? 'none' : ''; });
+  if(isGerant && (window.currentView==='reports' || window.currentView==='settings')){
+    switchTab('dashboard');
+  }
+}
+
+function openRecovery(){
+  if(!settings.secQuestion){
+    alert("Aucune question de secours n'a été configurée. Demande au Patron de la configurer dans Réglages (une fois connecté), ou réinstalle l'application si toutes les données sont perdues.");
+    return;
+  }
+  document.getElementById('recoveryQuestionText').textContent = settings.secQuestion;
+  document.getElementById('recoveryAnswer').value = '';
+  document.getElementById('recoveryErr').textContent = '';
+  document.getElementById('modalRecovery').classList.add('active');
+}
+function checkRecovery(){
+  const ans = document.getElementById('recoveryAnswer').value.trim().toLowerCase();
+  if(ans && ans === (settings.secAnswer||'').trim().toLowerCase()){
+    users.patron = '1234'; users.gerant = '0000';
+    DB.set(KEYS.users, users);
+    closeModal('modalRecovery');
+    alert('PIN réinitialisés : Patron = 1234, Gérant = 0000. Connecte-toi puis change-les immédiatement dans Réglages.');
+  } else {
+    document.getElementById('recoveryErr').textContent = 'Réponse incorrecte.';
+  }
+}
+function saveSecurityQA(){
+  settings.secQuestion = document.getElementById('setSecQuestion').value.trim();
+  settings.secAnswer = document.getElementById('setSecAnswer').value.trim();
+  DB.set(KEYS.settings, settings);
+  alert('Question de secours enregistrée.');
+}
+
+// ==================== NAVIGATION ====================
+function switchTab(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+  window.currentView = name;
+  renderAll();
+}
+function fabAction(){
+  const v = window.currentView || 'dashboard';
+  if(v==='lots' || v==='dashboard') openLotModal();
+  else if(v==='feed') openFeedModal();
+  else if(v==='health' || v==='natural') openHealthModal();
+  else if(v==='sales') openSaleModal();
+  else if(v==='reports') openWeightModal();
+}
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+
+// ==================== RACES / SELECTS ====================
+function fillRaceSelect(){
+  document.getElementById('lotType').innerHTML = settings.races.map(r=>`<option value="${r}">${r}</option>`).join('');
+}
+function isLocalRace(name){ return (name||'').toLowerCase().includes('local'); }
+
+// ==================== LOTS ====================
+function openLotModal(){
+  fillRaceSelect();
+  document.getElementById('lotDate').value = today();
+  document.getElementById('lotCout').value = settings.prixPoussin || '';
+  document.getElementById('modalLot').classList.add('active');
+}
+function saveLot(){
+  const qty = parseInt(document.getElementById('lotQty').value)||0;
+  if(qty<=0){ alert("Indique une quantité valide."); return; }
+  const lot = {
+    id: uid(),
+    type: document.getElementById('lotType').value,
+    source: document.getElementById('lotSource').value,
+    date: document.getElementById('lotDate').value || today(),
+    qtyInitiale: qty,
+    qtyActuelle: qty,
+    cout: parseFloat(document.getElementById('lotCout').value)||0,
+    fournisseur: document.getElementById('lotFournisseur').value,
+    notes: document.getElementById('lotNotes').value
+  };
+  lots.push(lot); DB.set(KEYS.lots, lots);
+  ['lotQty','lotFournisseur','lotNotes'].forEach(id=>document.getElementById(id).value='');
+  closeModal('modalLot'); renderAll();
+}
+function openUpdateModal(lotId){
+  document.getElementById('updLotId').value = lotId;
+  document.getElementById('updMorts').value='';
+  document.getElementById('updRaison').value='';
+  document.getElementById('modalUpdate').classList.add('active');
+}
+function saveMortalite(){
+  const id = document.getElementById('updLotId').value;
+  const morts = parseInt(document.getElementById('updMorts').value)||0;
+  const lot = lots.find(l=>l.id===id);
+  if(lot && morts>0){
+    lot.qtyActuelle = Math.max(0, lot.qtyActuelle - morts);
+    DB.set(KEYS.lots, lots);
+    health.push({id:uid(), lotId:id, type:'mortalite', date:today(), desc:`${morts} mort(s) — ${document.getElementById('updRaison').value||'raison non précisée'}`});
+    DB.set(KEYS.health, health);
+  }
+  closeModal('modalUpdate'); renderAll();
+}
+function deleteLot(id){
+  if(!confirm('Supprimer ce lot et ses données liées ?')) return;
+  lots = lots.filter(l=>l.id!==id); DB.set(KEYS.lots, lots);
+  renderAll();
+}
+function stageInfo(lot){
+  const j = ageJours(lot.date);
+  const type = (lot.type||'').toLowerCase();
+  let total = 90, label;
+  if(type.includes('dindon')){
+    total = 150;
+    label = j<21 ? '🐣 Dindonneau (0-3 sem)' : j<70 ? '⚠️ Période sensible / crise du rouge (3-10 sem)' : j<150 ? '🦃 Croissance' : '✅ Adulte';
+  } else if(type.includes('pintade')){
+    total = 110;
+    label = j<21 ? '🐣 Pintadeau (0-3 sem, très fragile au froid)' : j<78 ? '🐤 Croissance' : j<110 ? '🐔 Finition' : '✅ Adulte (quitte la mère ~2,6 mois)';
+  } else {
+    label = j<21 ? '🐣 Poussin (0-3 sem)' : j<45 ? '🐤 Croissance (3-6 sem)' : j<90 ? '🐔 Finition (6-12 sem)' : '✅ Prêt / adulte';
+  }
+  const pct = Math.min(100, Math.round((j/total)*100));
+  return {j, pct, label};
+}
+function renderLots(){
+  const wrap = document.getElementById('lotsList');
+  if(lots.length===0){ wrap.innerHTML = '<div class="empty">Aucun lot pour le moment. Ajoute ton premier lot.</div>'; return; }
+  wrap.innerHTML = lots.map(lot=>{
+    const s = stageInfo(lot);
+    const cls = isLocalRace(lot.type) ? 'local' : '';
+    const r = calcCoutRevient(lot.id);
+    const marge = settings.margeDefaut||30;
+    const prixSuggere = r ? r.coutUnitaire*(1+marge/100) : 0;
+    const beneficeTotal = r ? (prixSuggere-r.coutUnitaire)*r.qtyRestante : 0;
+    return `<div class="lot-card ${cls}">
+      <div class="lot-header">
+        <div><strong>${lot.type}</strong> — ${lot.qtyActuelle}/${lot.qtyInitiale}</div>
+        <span class="badge ${cls}">${lot.source==='oeufs'?'Œufs':'Poussins'}</span>
+      </div>
+      <div class="lot-meta">
+        📅 Arrivée: ${lot.date} — Âge: ${s.j} j<br>
+        ${s.label}<br>
+        ${lot.fournisseur?('Fournisseur: '+lot.fournisseur+'<br>'):''}
+      </div>
+      <div class="stage-bar"><div class="stage-fill" style="width:${s.pct}%"></div></div>
+      <div class="fin-only" style="background:#e8f3ee; border-radius:8px; padding:8px 10px; margin-top:8px; font-size:0.76rem; line-height:1.6;">
+        💹 <b>Rentabilité en direct</b><br>
+        Coût cumulé : ${fmt(r?r.coutTotal:0)} ${devise()} (poussins ${fmt(r?r.coutPoussins:0)} + aliment ${fmt(r?r.coutAliment:0)} + santé ${fmt(r?r.coutSante:0)})<br>
+        Coût de revient/tête : <b>${fmt(r?r.coutUnitaire:0)} ${devise()}</b><br>
+        Prix suggéré (marge ${marge}%) : <b style="color:var(--vert-fonce);">${fmt(prixSuggere)} ${devise()}</b> · Bénéfice potentiel restant : <b>${fmt(beneficeTotal)} ${devise()}</b>
+      </div>
+      <div class="lot-actions">
+        <button class="btn small danger" onclick="openUpdateModal('${lot.id}')">Signaler mortalité</button>
+        <button class="btn small outline fin-only" onclick="deleteLot('${lot.id}')">Supprimer</button>
+      </div>
+    </div>`;
+  }).join('');
+  applyRoleRestrictions();
+}
+
+// ==================== ALIMENTATION ====================
+function openFeedModal(){
+  document.getElementById('feedDate').value = today();
+  document.getElementById('feedCoutInput').placeholder = "Prix/kg défaut: "+(settings.prixAliment||0);
+  const opts = lots.map(l=>`<option value="${l.id}">${l.type} — ${l.date} (${l.qtyActuelle} têtes)</option>`).join('');
+  document.getElementById('feedLot').innerHTML = '<option value="">— Stock général / non attribué —</option>' + opts;
+  document.getElementById('modalFeed').classList.add('active');
+}
+function saveFeed(){
+  const qty = parseFloat(document.getElementById('feedQty').value)||0;
+  if(qty<=0){ alert("Indique une quantité valide."); return; }
+  const type = document.getElementById('feedTypeSel').value;
+  const lotId = document.getElementById('feedLot').value || '';
+  let cout = parseFloat(document.getElementById('feedCoutInput').value)||0;
+  if(type==='entree' && cout===0){ cout = qty * (settings.prixAliment||0); }
+  if(type==='sortie'){
+    // Coût calculé sur la base du coût moyen/kg du stock déjà acheté, sinon prix par défaut
+    const entrees = feed.filter(f=>f.type==='entree');
+    const totalQtyE = entrees.reduce((s,f)=>s+f.qty,0);
+    const totalCoutE = entrees.reduce((s,f)=>s+f.cout,0);
+    const coutMoyenKg = totalQtyE>0 ? (totalCoutE/totalQtyE) : (settings.prixAliment||0);
+    cout = qty * coutMoyenKg;
+  }
+  feed.push({
+    id: uid(), type, lotId,
+    date: document.getElementById('feedDate').value || today(),
+    qty, cout,
+    notes: document.getElementById('feedNotes').value
+  });
+  DB.set(KEYS.feed, feed);
+  ['feedQty','feedCoutInput','feedNotes'].forEach(id=>document.getElementById(id).value='');
+  closeModal('modalFeed'); renderAll();
+}
+function renderFeed(){
+  const stock = feed.reduce((s,f)=> s + (f.type==='entree'?f.qty:-f.qty), 0);
+  const cost = feed.reduce((s,f)=> s + (f.type==='entree'?f.cout:0), 0);
+  document.getElementById('feedStock').textContent = fmt(stock);
+  document.getElementById('feedCost').textContent = fmt(cost);
+  const wrap = document.getElementById('feedList');
+  if(feed.length===0){ wrap.innerHTML = '<div class="empty">Aucun mouvement enregistré.</div>'; return; }
+  wrap.innerHTML = [...feed].reverse().map(f=>`
+    <div class="list-item">
+      <div><div class="li-main">${f.type==='entree'?'➕ Entrée':'➖ Sortie'} — ${f.qty} kg</div><div class="li-sub">${f.date} ${f.lotId?('· '+lotLabel(f.lotId)):'· stock général'} ${f.notes?('· '+f.notes):''}</div></div>
+      <div class="li-val fin-only">${fmt(f.cout)+' '+devise()}</div>
+    </div>`).join('');
+  applyRoleRestrictions();
+}
+
+// ==================== SANTÉ — GUIDE MALADIES ====================
+const DISEASES = [
+  {nom:"Maladie de Newcastle (pseudo-peste aviaire)",
+   symptomes:"Toux, difficultés respiratoires, torticolis, diarrhée verdâtre, chute brutale de ponte, mortalité rapide et élevée.",
+   prevention:"Vaccination régulière (dès les premiers jours puis rappels), isolement des nouveaux arrivants, désinfection du poulailler.",
+   traitement:"Aucun traitement curatif efficace — isoler immédiatement les malades, contacter un agent vétérinaire, désinfecter tout le matériel."},
+  {nom:"Coccidiose",
+   symptomes:"Diarrhée sanglante, plumes ébouriffées, prostration, retard de croissance, mortalité chez les jeunes poussins.",
+   prevention:"Litière sèche et propre, éviter la surpopulation, aliment anticoccidien pour les jeunes sujets.",
+   traitement:"Anticoccidiens (sulfamides) dans l'eau de boisson selon la notice du produit, disponibles chez un vétérinaire agréé."},
+  {nom:"Variole aviaire",
+   symptomes:"Boutons/croûtes sur la crête, les barbillons et autour des yeux ; parfois plaques blanchâtres dans la bouche.",
+   prevention:"Vaccination préventive, lutte contre les moustiques (vecteurs de transmission), hygiène du poulailler.",
+   traitement:"Pas de traitement spécifique — désinfecter les lésions avec un antiseptique doux, renforcer l'alimentation, isoler les sujets atteints."},
+  {nom:"Maladie de Gumboro",
+   symptomes:"Diarrhée blanchâtre, prostration, tremblements, forte mortalité chez les jeunes poussins (3-6 semaines).",
+   prevention:"Vaccination précoce des poussins, désinfection stricte entre les bandes.",
+   traitement:"Pas de traitement curatif — soins de soutien (vitamines, hydratation), isolement immédiat."},
+  {nom:"Choléra aviaire (pasteurellose)",
+   symptomes:"Abattement soudain, diarrhée, écoulement nasal, crête bleuâtre, mortalité rapide chez l'adulte.",
+   prevention:"Hygiène rigoureuse, élimination rapide des cadavres, éviter le contact avec oiseaux sauvages.",
+   traitement:"Antibiotiques prescrits par un vétérinaire dès les premiers signes ; isoler le lot atteint."},
+  {nom:"Salmonellose (pullorose)",
+   symptomes:"Diarrhée blanche collante autour du cloaque, faiblesse, mortalité élevée chez les poussins d'un jour.",
+   prevention:"Acheter des poussins/œufs certifiés sains, désinfection des couveuses, hygiène de l'eau et des mangeoires.",
+   traitement:"Antibiotiques adaptés sous conseil vétérinaire ; renforcer l'hygiène de l'élevage."},
+  {nom:"Parasites internes (vers)",
+   symptomes:"Amaigrissement malgré un bon appétit, diarrhée, plumage terne, baisse de ponte.",
+   prevention:"Vermifugation régulière (tous les 2-3 mois), litière propre et sèche.",
+   traitement:"Vermifuge adapté à la volaille, disponible en pharmacie vétérinaire, à renouveler selon la notice."},
+  {nom:"Histomonose (maladie de la tête noire) — CRITIQUE pour le dindon",
+   symptomes:"Fientes jaune soufre caractéristiques, abattement, perte d'appétit, faiblesse marquée, parfois zones de tête noircies. Touche surtout les dindons (mortalité pouvant atteindre 70-100% sans traitement) mais aussi la pintade et le poulet (souvent porteur sans symptôme).",
+   prevention:"⚠️ NE JAMAIS élever dindons et poulets ensemble sur le même parcours — le poulet héberge souvent sans symptôme le ver Heterakis qui transmet la maladie. Vermifugation régulière (le ver Heterakis est le vecteur), bonne hygiène du sol, éviter les parcours contaminés par d'anciens élevages de volaille.",
+   traitement:"Aucun traitement curatif efficace autorisé actuellement — la prévention (séparation des espèces + vermifuge régulier) est la seule vraie protection. Consulte un agent vétérinaire dès les premiers signes chez un dindon."}
+];
+function renderDiseaseGuide(){
+  document.getElementById('diseaseGuide').innerHTML = DISEASES.map(d=>`
+    <div class="info-card">
+      <h4>⚠️ ${d.nom}</h4>
+      <div class="dsec"><div class="dlabel">Symptômes</div><p>${d.symptomes}</p></div>
+      <div class="dsec"><div class="dlabel">Prévention</div><p>${d.prevention}</p></div>
+      <div class="dsec"><div class="dlabel">Traitement</div><p>${d.traitement}</p></div>
+    </div>`).join('');
+}
+
+// ==================== NATUREL — ALIMENTS & REMÈDES ENDOGÈNES ====================
+const NATURAL_FEEDS = [
+  {nom:"Ration de base croissance (poussins 0-2 mois)",
+   composition:"Maïs concassé, tourteau de soja ou de coton, son de riz ou de mil, farine de poisson locale, coquilles d'œufs pilées finement (source de calcium), sel à faible dose.",
+   avantages:"Formule simple à base d'ingrédients disponibles localement, réduit la dépendance à l'aliment industriel importé, coût nettement inférieur.",
+   conseil:"Bien sécher et moudre les ingrédients avant mélange ; introduire progressivement les nouveaux ingrédients pour éviter les troubles digestifs."},
+  {nom:"Complément protéiné local",
+   composition:"Asticots ou larves élevées sur déchets organiques, termites, farine de poisson séché, tourteau d'arachide.",
+   avantages:"Excellente source de protéines à très faible coût, valorise les déchets de la ferme ou du foyer.",
+   conseil:"Toujours bien sécher/cuire les asticots avant distribution pour limiter les risques sanitaires."},
+  {nom:"Complément vitaminé et minéral",
+   composition:"Feuilles de moringa séchées et pilées, feuilles de patate douce, argile ou cendre de bois tamisée en petite quantité, coquilles d'huîtres ou d'œufs pilées.",
+   avantages:"Renforce l'immunité naturellement, améliore la qualité de la coquille des œufs et la croissance.",
+   conseil:"Le moringa peut représenter jusqu'à 5-10% de la ration sans déséquilibrer l'alimentation."},
+  {nom:"Ration d'entretien (poulets adultes / reproducteurs)",
+   composition:"Maïs, son de céréales, épluchures de légumes, verdure fraîche (feuilles), petite quantité de tourteau protéiné.",
+   avantages:"Adaptée à l'élevage semi-extensif où les poulets se nourrissent en partie en plein air.",
+   conseil:"Distribuer le matin et le soir avant le retour au poulailler pour habituer les poulets à rentrer d'eux-mêmes."}
+];
+const NATURAL_REMEDIES = [
+  {nom:"Ail et piment",
+   usage:"Pilés et mélangés à l'eau de boisson ou à l'aliment, utilisés traditionnellement pour stimuler l'appétit et comme répulsif contre certains parasites digestifs.",
+   precaution:"Usage en complément de l'hygiène générale, pas un substitut à la vaccination ni à un traitement vétérinaire en cas de maladie déclarée."},
+  {nom:"Feuilles de neem (margousier)",
+   usage:"Décoction de feuilles utilisée traditionnellement en aspersion dans le poulailler pour éloigner certains insectes et parasites externes (poux, tiques).",
+   precaution:"Ne pas donner en grande quantité par voie orale sans expérience locale confirmée ; usage externe/environnemental à privilégier."},
+  {nom:"Feuilles de papayer",
+   usage:"Utilisées traditionnellement en décoction comme vermifuge naturel complémentaire contre les parasites intestinaux.",
+   precaution:"À utiliser en prévention légère ; en cas de forte infestation parasitaire, un vermifuge vétérinaire reste recommandé."},
+  {nom:"Cendre de bois et terre argileuse",
+   usage:"Utilisées en bain de poussière dans l'enclos pour aider les poulets à se débarrasser naturellement des poux et parasites externes.",
+   precaution:"S'assurer que la cendre est bien refroidie et propre avant de la mettre à disposition des poulets."},
+  {nom:"Citron et miel local",
+   usage:"Mélangés à l'eau de boisson en période de stress (transport, chaleur, changement d'aliment) pour soutenir l'hydratation et l'appétit.",
+   precaution:"Complément de confort, ne remplace pas un traitement en cas de maladie identifiée."}
+];
+const NATURAL_TIPS = [
+  {titre:"Autonomie en poussins", texte:"La couvaison naturelle par une poule locale ou l'incubation artificielle avec des œufs de ton propre élevage réduit la dépendance aux fournisseurs extérieurs et préserve les lignées adaptées au climat local."},
+  {titre:"Valorisation des ressources locales", texte:"Les sous-produits agricoles (son, tourteaux, épluchures) et les déchets organiques transformés en asticots permettent de réduire fortement le coût de l'aliment tout en restant dans une logique d'économie circulaire."},
+  {titre:"Savoirs transmis par les anciens", texte:"Beaucoup de pratiques traditionnelles (bain de poussière, plantes répulsives, sélection des poules les plus résistantes pour la reproduction) restent efficaces et méritent d'être documentées et transmises, en complément — non en remplacement — des conseils d'un agent vétérinaire pour les maladies graves."},
+  {titre:"Sélection génétique locale", texte:"Garder et faire reproduire les sujets les plus résistants et les meilleures pondeuses de chaque lot local contribue, sur plusieurs générations, à une souche mieux adaptée à ton environnement."}
+];
+function renderNatural(){
+  document.getElementById('naturalFeeds').innerHTML = NATURAL_FEEDS.map(f=>`
+    <div class="info-card natural">
+      <h4>🌾 ${f.nom}</h4>
+      <div class="dsec"><div class="dlabel">Composition</div><p>${f.composition}</p></div>
+      <div class="dsec"><div class="dlabel">Avantages</div><p>${f.avantages}</p></div>
+      <div class="dsec"><div class="dlabel">Conseil</div><p>${f.conseil}</p></div>
+    </div>`).join('');
+  document.getElementById('naturalRemedies').innerHTML = NATURAL_REMEDIES.map(r=>`
+    <div class="info-card natural">
+      <h4>🍃 ${r.nom}</h4>
+      <div class="dsec"><div class="dlabel">Usage traditionnel</div><p>${r.usage}</p></div>
+      <div class="dsec"><div class="dlabel">Précaution</div><p>${r.precaution}</p></div>
+    </div>`).join('');
+  document.getElementById('naturalTips').innerHTML = NATURAL_TIPS.map(t=>`
+    <div class="info-card natural"><h4>💡 ${t.titre}</h4><p style="font-size:0.82rem; line-height:1.4;">${t.texte}</p></div>`).join('');
+}
+
+// ==================== GUIDE PRO — MEILLEURES PRATIQUES ====================
+const BP_COMPARE = [
+  {critere:"Croissance", kuroiler:"Rapide : ~2 kg en 3-4 mois en semi-extensif, plus vite en intensif.", local:"Plus lente : souvent 5-6 mois pour atteindre un poids commercial équivalent.", faso:"Intermédiaire : environ 1 mois de moins que le poulet local pur pour le même poids."},
+  {critere:"Ponte", kuroiler:"Élevée, jusqu'à 150-200 œufs/an avec bonne gestion.", local:"Plus faible, généralement 40-80 œufs/an, mais souvent meilleure couveuse naturelle.", faso:"Nettement améliorée par la lignée Sasso, tout en gardant une bonne rusticité."},
+  {critere:"Résistance", kuroiler:"Bonne résistance générale, adaptée aux conditions tropicales.", local:"Très résistante, bien acclimatée à l'environnement local depuis des générations.", faso:"Très bonne : mortalité autour de 5% contre ~50% pour les lignées locales non sélectionnées."},
+  {critere:"Valeur marchande", kuroiler:"Bon compromis prix/croissance pour la vente en volume.", local:"Souvent mieux valorisé au kg sur le marché local (goût, tradition), vendu plus cher à l'unité.", faso:"Garde l'apparence et le goût du poulet local (bien valorisé) tout en produisant plus vite."},
+  {critere:"Investissement de départ", kuroiler:"Nécessite l'achat de poussins auprès de fournisseurs spécialisés.", local:"Peut démarrer avec ton propre cheptel existant, coût de départ plus faible.", faso:"Nécessite de se procurer des sujets/œufs certifiés (bagués) auprès de la filière officielle."}
+];
+const BP_STAGES = [
+  {titre:"Semaine 1-2 : démarrage", texte:"Chauffage (poussinière) à 32-35°C la première semaine, aliment démarrage riche en protéines (moulé fin), eau propre renouvelée plusieurs fois par jour, éviter les courants d'air."},
+  {titre:"Semaine 3-6 : croissance", texte:"Réduire progressivement le chauffage, augmenter l'espace disponible, passer à un aliment croissance, surveiller les premiers signes de maladie (léthargie, plumes ébouriffées)."},
+  {titre:"Semaine 7-12 : finition", texte:"Aliment finition ou ration locale enrichie, augmenter l'accès au plein air pour le semi-extensif, peser régulièrement pour suivre la courbe de croissance et ajuster l'alimentation."},
+  {titre:"À partir de 3 mois : valorisation", texte:"Selon l'objectif : vente à ce stade (poulet de chair) ou conservation des meilleurs sujets pour la reproduction (poules pondeuses, coqs reproducteurs)."}
+];
+const BP_HOUSING = [
+  {titre:"Densité recommandée", texte:"Environ 8 à 10 poussins/m² en démarrage, réduite à 4-6 têtes/m² à l'âge adulte en claustration ; en semi-extensif, prévoir un grand parcours clôturé en plus du poulailler."},
+  {titre:"Ventilation et litière", texte:"Poulailler bien ventilé mais sans courants d'air directs, litière sèche (paille, balle de riz) renouvelée régulièrement pour limiter l'humidité et les maladies respiratoires."},
+  {titre:"Protection", texte:"Grillage solide contre les prédateurs (rats, serpents, rapaces), toiture étanche, surélévation légère du sol pour éviter les inondations en saison des pluies."}
+];
+const BP_BREEDING = [
+  {titre:"Sélection des reproducteurs", texte:"Garder les sujets les plus résistants, à croissance régulière et sans anomalie visible, pour constituer ta lignée reproductrice — surtout utile pour les poulets locaux."},
+  {titre:"Incubation naturelle vs artificielle", texte:"La couvaison naturelle par une poule locale demande peu d'équipement mais interrompt sa ponte ; l'incubation artificielle demande un incubateur mais permet une production continue d'œufs et de poussins."},
+  {titre:"Renouvellement du cheptel", texte:"Éviter la consanguinité en introduisant régulièrement un nouveau coq ou de nouveaux reproducteurs venant d'un autre élevage."}
+];
+const BP_HYGIENE = [
+  {titre:"Eau", texte:"Toujours disponible, propre, renouvelée au moins 2 fois par jour ; nettoyer les abreuvoirs quotidiennement pour éviter la prolifération de bactéries."},
+  {titre:"Nettoyage du poulailler", texte:"Nettoyage complet et désinfection entre chaque bande, vide sanitaire de quelques jours recommandé avant l'arrivée d'un nouveau lot."},
+  {titre:"Quarantaine", texte:"Isoler tout nouvel arrivant (poussin ou poule) pendant au moins une semaine avant de l'intégrer au reste du cheptel."}
+];
+const BP_SALES = [
+  {titre:"Segmenter ton offre", texte:"Le Kuroiler se positionne bien sur le volume et le prix intermédiaire ; le poulet local se valorise mieux sur le marché traditionnel et les commandes spéciales (fêtes, cérémonies)."},
+  {titre:"Vente directe vs intermédiaires", texte:"La vente directe aux ménages ou restaurants locaux donne généralement une meilleure marge que la vente en gros à un intermédiaire."},
+  {titre:"Anticiper la demande", texte:"Planifier les mises en place de lots pour que les poulets arrivent à maturité avant les périodes de forte demande (fêtes religieuses, fin d'année)."}
+];
+// ==================== ENCYCLOPÉDIE ====================
+let encycloLevel = 'debutant';
+const ENCYCLOPEDIA = [
+  // --- BASES (débutant) ---
+  {cat:"Bases de l'aviculture", niveau:'debutant', titre:"Qu'est-ce que l'aviculture ?",
+   texte:"L'aviculture est l'élevage des oiseaux de basse-cour (poulets, pintades, canards...) pour la viande, les œufs ou la reproduction. C'est une activité accessible avec peu de moyens de départ, qui peut se développer progressivement."},
+  {cat:"Bases de l'aviculture", niveau:'debutant', titre:"Le cycle de vie du poulet", svg:'cycle',
+   texte:"Œuf (21 jours d'incubation) → poussin (0 à 4 semaines) → poulet en croissance (4 à 12 semaines) → poulet adulte (à partir de 3 mois, apte à la reproduction ou à la vente selon la race)."},
+  {cat:"Bases de l'aviculture", niveau:'debutant', titre:"Vocabulaire de base",
+   texte:"Couvée : ensemble d'œufs couvés par une poule. Ponte : action de pondre un œuf. Mue : période où la poule perd ses plumes et arrête de pondre. Litière : matière (paille, copeaux) qui couvre le sol du poulailler. Volaille de chair : élevée pour la viande. Pondeuse : élevée pour les œufs."},
+  {cat:"Bases de l'aviculture", niveau:'debutant', titre:"Les 4 besoins essentiels d'un poulet",
+   texte:"Eau propre en permanence, aliment adapté à son âge, un abri sec et protégé des prédateurs, et de la sécurité sanitaire (peu de contact avec des animaux malades ou étrangers)."},
+  {cat:"Bases de l'aviculture", niveau:'debutant', titre:"Poulet de chair vs pondeuse",
+   texte:"Un poulet de chair est élevé pour sa viande et vendu jeune (3-5 mois). Une pondeuse est gardée plus longtemps pour produire des œufs régulièrement. Le Kuroiler et le poulet local peuvent servir aux deux usages selon la sélection."},
+
+  // --- ANATOMIE & CYCLE (tous) ---
+  {cat:"Anatomie & cycle de vie", niveau:'tous', titre:"Reconnaître un poulet en bonne santé",
+   texte:"Yeux vifs et ouverts, crête bien rouge et dressée, plumage lisse et brillant, démarche active, appétit normal, fientes bien formées (pas de diarrhée persistante)."},
+  {cat:"Anatomie & cycle de vie", niveau:'expert', titre:"Courbe de croissance standard",
+   texte:"Pour le Kuroiler en conditions optimales : environ 150-200g à 2 semaines, 500-700g à 6 semaines, 1,2-1,5kg à 10 semaines, 2kg+ à 14-16 semaines. Le poulet local suit une courbe plus lente, souvent 30 à 40% de croissance en moins sur la même période. Compare toujours tes pesées réelles à ces repères pour détecter un retard de croissance."},
+
+  // --- RACES & GÉNÉTIQUE ---
+  {cat:"Races & génétique", niveau:'debutant', titre:"Le Kuroiler, c'est quoi exactement ?",
+   texte:"Le Kuroiler est un poulet issu d'un croisement (race améliorée), développé pour combiner croissance rapide, bonne ponte et résistance, tout en restant adapté à l'élevage familial en plein air."},
+  {cat:"Races & génétique", niveau:'expert', titre:"Hétérosis et croisement",
+   texte:"Le Kuroiler bénéficie de la vigueur hybride (hétérosis) issue du croisement de plusieurs lignées : les descendants performent souvent mieux que chacune des lignées parentales sur la croissance et la résistance, mais cet avantage s'estompe si on fait reproduire les Kuroiler entre eux sur plusieurs générations sans renouveler les souches parentales."},
+  {cat:"Races & génétique", niveau:'expert', titre:"Sélection génétique du cheptel local",
+   texte:"Pour améliorer une souche locale sans recourir à des poussins hybrides achetés, sélectionne sur plusieurs générations les sujets à croissance rapide, bonne ponte et résistance aux maladies ; note ces critères par lot dans le carnet sanitaire pour objectiver la sélection plutôt que de se fier uniquement à l'observation."},
+
+  // --- ALIMENTATION ---
+  {cat:"Alimentation", niveau:'debutant', titre:"Les 3 phases d'alimentation",
+   texte:"Démarrage (0-3 semaines) : aliment riche en protéines, en miettes fines. Croissance (3-8 semaines) : aliment intermédiaire. Finition (8 semaines+) : aliment plus énergétique pour terminer l'engraissement."},
+  {cat:"Alimentation", niveau:'expert', titre:"Indice de consommation (FCR)",
+   texte:"Le FCR (Feed Conversion Ratio) mesure la quantité d'aliment nécessaire pour produire 1 kg de poids vif : FCR = kg d'aliment consommé ÷ kg de poids gagné. Un bon FCR pour le Kuroiler tourne autour de 2,5-3 en semi-extensif. Plus le chiffre est bas, plus l'élevage est efficace économiquement. Utilise tes pesées et ton stock d'aliment sorti pour le calculer toi-même."},
+  {cat:"Alimentation", niveau:'tous', titre:"Aliments naturels locaux",
+   texte:"Voir l'onglet 🌿 Naturel pour les recettes détaillées à base de maïs, tourteaux, moringa et asticots, qui permettent de réduire la dépendance à l'aliment industriel importé."},
+
+  // --- SANTÉ & BIOSÉCURITÉ ---
+  {cat:"Santé & biosécurité", niveau:'debutant', titre:"Pourquoi vacciner ?",
+   texte:"La vaccination protège contre des maladies graves comme la maladie de Newcastle, qui peut tuer un lot entier en quelques jours sans traitement possible. C'est un investissement qui protège tout ton élevage."},
+  {cat:"Santé & biosécurité", niveau:'expert', titre:"Principe des zones de biosécurité", svg:'biosecurite',
+   texte:"Organise ton exploitation en zones : zone propre (poulailler), zone tampon (abords immédiats), zone extérieure (accès public). Limite les allées et venues entre zones, prévois un point de lavage des mains/bottes à l'entrée du poulailler, et n'introduis jamais un nouvel animal sans passer par la quarantaine."},
+  {cat:"Santé & biosécurité", niveau:'tous', titre:"Guide des maladies courantes",
+   texte:"Voir l'onglet 💊 Santé pour le détail complet des symptômes, prévention et traitement des maladies les plus fréquentes (Newcastle, coccidiose, Gumboro, choléra aviaire...)."},
+  {cat:"Santé & biosécurité", niveau:'expert', titre:"Calendrier vaccinal indicatif",
+   texte:"À titre indicatif (à confirmer avec un agent vétérinaire local selon les maladies présentes dans ta zone) : Newcastle J1 puis rappel à 3-4 semaines, Gumboro vers J14, variole aviaire vers 6-8 semaines. Note chaque vaccination dans le carnet sanitaire de l'appli pour garder un historique par lot."},
+
+  // --- ÉCONOMIE & GESTION ---
+  {cat:"Économie & gestion", niveau:'debutant', titre:"Calculer sa marge simplement",
+   texte:"Marge = revenu total des ventes − (coût des poussins/œufs + coût de l'aliment). L'appli calcule ça automatiquement dans l'onglet Accueil et Rapports."},
+  {cat:"Économie & gestion", niveau:'expert', titre:"Seuil de rentabilité par lot",
+   texte:"Le seuil de rentabilité est le nombre de poulets à vendre (au prix prévu) pour couvrir tous les coûts du lot (poussins + aliment). Compare ce seuil à ta mortalité réelle : si la mortalité dépasse largement tes prévisions, le lot peut devenir déficitaire même si les ventes se passent bien."},
+  {cat:"Économie & gestion", niveau:'expert', titre:"Diversifier les canaux de vente",
+   texte:"Ne dépends pas d'un seul acheteur : combine vente directe aux ménages, contrats avec des restaurants/gargotes, et ventes de circonstance (fêtes) pour lisser tes revenus sur l'année."},
+
+  // --- TECHNIQUES AVANCÉES (expert) ---
+  {cat:"Techniques avancées", niveau:'expert', titre:"Incubation artificielle : paramètres clés",
+   texte:"Température cible autour de 37,5°C, humidité relative around 55-60% les 18 premiers jours puis 65-70% en fin d'incubation, retournement des œufs plusieurs fois par jour jusqu'à J18. Un incubateur mal calibré est la première cause d'échec d'éclosion."},
+  {cat:"Techniques avancées", niveau:'expert', titre:"Gestion de la ventilation en saison chaude",
+   texte:"Au-delà de 32-35°C ambiants, les poulets réduisent leur consommation d'aliment et sont stressés : augmente la ventilation naturelle, assure un accès à l'eau fraîche renouvelée plus souvent, et évite de manipuler les animaux aux heures les plus chaudes."},
+
+  // --- LEXIQUE MOORÉ (vérifié) ---
+  {cat:"🗣️ Lexique mooré", niveau:'tous', titre:"Vocabulaire de base de l'élevage",
+   texte:"Poule = Noaaga. Coq = No-raoogo. Poulailler = Noos roogo. Élevage = Guulgo. Élever = Guule. Ferme = Guulg-zaka. Ces mots viennent d'un lexique français-mooré publié en ligne — vérifie-les avec un locuteur natif avant un usage officiel."},
+  {cat:"🗣️ Lexique mooré", niveau:'tous', titre:"Santé et soins en mooré",
+   texte:"Santé = Laafi. Malade = Bâada. Maladie = Bâaga. Guérir = Saooge. Guérison = Saoogre. Vaccin = Bogb tiim. Vacciner = Boge. Vaccination = Bogbo. Ce sont les mots généraux ; les noms précis des maladies modernes (Newcastle, coccidiose, Gumboro) n'ont pas d'équivalent traditionnel connu — même les éleveurs mooréphones utilisent souvent le nom français ou scientifique avec l'agent vétérinaire."},
+  {cat:"🗣️ Lexique mooré", niveau:'tous', titre:"Commerce et argent",
+   texte:"Acheter = Da / Rà. Vendre = Koose. Vente = Koosgo. Acheteur = Ràada. Argent = Lidgi. Marché = Raaga. Cher = Toogo. Ces mots te seront utiles pour négocier avec des vendeurs ou clients mooréphones."},
+  {cat:"🗣️ Lexique mooré", niveau:'tous', titre:"Salutations utiles à connaître",
+   texte:"Le matin, jusqu'à 11h : « Ney Yibéogo ! » (Salut à vous) — réponse « Laafi » (En bonne santé). Entre 11h et 15h : « Ney windga ! ». Après 15h : « Ney Zaabré ! ». Merci se dit « Barka »."},
+  {cat:"🗣️ Lexique mooré", niveau:'debutant', titre:"Compter de 1 à 10 en mooré",
+   texte:"1 = Yembre/Ye, 2 = Yiibu, 3 = Taabo, 4 = Naasé, 5 = Nu, 6 = Yoobe, 7 (non trouvé dans nos sources — à vérifier), 8 = Nii yibioro, 9 = Wouai, 10 = Piiga."},
+  {cat:"🗣️ Lexique mooré", niveau:'tous', titre:"Le « poulet bicyclette », une expression locale",
+   texte:"Au Burkina Faso, on appelle parfois le poulet local à pattes longues « poulet bicyclette » — une expression imagée qui désigne justement le poulet local élevé en liberté, par opposition aux races industrielles."},
+  {cat:"🗣️ Lexique mooré", niveau:'expert', titre:"⚠️ Limite importante de ce lexique",
+   texte:"Ce lexique vient d'une source écrite trouvée en ligne, pas d'une validation par un linguiste mooré professionnel. Pour tout usage officiel, formation d'éleveurs, ou support écrit destiné à circuler, fais relire ces termes par un locuteur natif du mooré avant diffusion — une erreur de traduction sur un terme de santé animale peut prêter à confusion."},
+
+  // --- CONSTRUCTION & INFRASTRUCTURE ---
+  {cat:"🏗️ Construction & infrastructure", niveau:'debutant', titre:"Dimensionner son poulailler", svg:'poulailler',
+   texte:"Règle simple : compte environ 0,15 à 0,20 m² par poulet adulte en claustration (soit 15-20 têtes pour 3m²), et prévois un parcours extérieur clôturé au moins 3 à 5 fois plus grand si tu fais du semi-extensif. Mieux vaut un poulailler un peu plus grand dès le départ que d'agrandir dans l'urgence."},
+  {cat:"🏗️ Construction & infrastructure", niveau:'debutant', titre:"Matériaux locaux accessibles",
+   texte:"Murs en banco (terre battue) ou parpaings selon le budget, toiture en tôle ondulée (meilleure durabilité que la paille mais plus chaude — prévoir une bonne hauteur sous toiture pour l'aération), grillage à poule pour les ouvertures et le parcours extérieur, sol en terre battue surélevée ou dallé selon les moyens."},
+  {cat:"🏗️ Construction & infrastructure", niveau:'expert', titre:"Orientation et gestion thermique du bâtiment",
+   texte:"Oriente le bâtiment est-ouest (façade longue exposée au nord et au sud) pour limiter l'ensoleillement direct sur les murs longs aux heures chaudes. Prévois une avancée de toit (débord) d'au moins 50cm pour protéger les ouvertures de la pluie battante tout en gardant la ventilation. Une hauteur sous plafond de 2,2 à 2,5m améliore nettement la circulation d'air par rapport à un bâtiment bas."},
+  {cat:"🏗️ Construction & infrastructure", niveau:'debutant', titre:"Budget indicatif de construction",
+   texte:"Pour un poulailler simple de 20-30 têtes en matériaux locaux (banco + tôle + grillage), le budget varie fortement selon la région et les prix du moment — prévois de comparer au moins 3 devis de matériaux avant de commencer, et priorise d'abord la toiture et le grillage anti-prédateurs plutôt que la finition esthétique des murs."},
+
+  // --- VALORISATION DU FUMIER (savoirs endogènes) ---
+  {cat:"🏗️ Construction & infrastructure", niveau:'tous', titre:"♻️ Valoriser le fumier de poulailler",
+   texte:"Le fumier de volaille est un engrais organique riche, très recherché par les maraîchers. Ramasse-le régulièrement, laisse-le sécher/composter 2 à 3 semaines avant utilisation directe (frais, il peut brûler les jeunes plants), puis épands-le sur ton champ/potager ou vends-le en sacs aux maraîchers du quartier — une source de revenu complémentaire simple à mettre en place."},
+
+  // --- TRANSFORMATION & VALORISATION POST-VENTE ---
+  {cat:"Économie & gestion", niveau:'debutant', titre:"Vendre transformé plutôt que vivant",
+   texte:"Un poulet découpé, préparé ou déjà cuit (grillé, braisé) se vend souvent bien plus cher au kg qu'un poulet vivant équivalent, surtout auprès des restaurants, gargotes ou clients citadins pressés. Commence petit : propose la découpe/préparation en option pour tes meilleurs clients avant d'investir dans du matériel supplémentaire."},
+  {cat:"Économie & gestion", niveau:'expert', titre:"Conservation : fumage et congélation",
+   texte:"Le fumage traditionnel permet de conserver la viande sans électricité et donne un produit à valeur ajoutée recherché sur certains marchés. La congélation demande un investissement (congélateur, électricité fiable) mais permet de lisser la vente sur plusieurs jours/semaines et d'éviter les pertes en période de faible demande. Évalue d'abord la demande réelle avant d'investir dans l'équipement."},
+
+  // --- GESTION CLIMATIQUE SAISONNIÈRE BURKINA ---
+  {cat:"Techniques avancées", niveau:'debutant', titre:"Saison d'harmattan (novembre-février)",
+   texte:"Nuits fraîches inhabituelles et air très sec et poussiéreux : protège les jeunes poussins du froid nocturne (couverture partielle du poulailler, chauffage d'appoint si besoin), et nettoie plus souvent les mangeoires/abreuvoirs car la poussière s'y dépose vite. La sécheresse de l'air favorise aussi les problèmes respiratoires — surveille la toux."},
+  {cat:"Techniques avancées", niveau:'debutant', titre:"Saison des pluies (juin-septembre)",
+   texte:"Risque accru de coccidiose et de maladies liées à l'humidité : litière qui s'humidifie plus vite (à changer plus souvent), boue autour du poulailler qui favorise les parasites, moustiques plus nombreux (vecteurs de la variole aviaire). Assure un bon drainage autour du bâtiment et surélève légèrement le sol si possible."},
+
+  // --- RÉGLEMENTATION ---
+  {cat:"Économie & gestion", niveau:'expert', titre:"⚖️ Cadre réglementaire sanitaire au Burkina",
+   texte:"La Direction Générale des Services Vétérinaires (DGSV) contrôle la conformité sanitaire des sites de vente et d'abattage de volaille, avec des inspections régulières à Ouagadougou (mise en conformité des sites exigée). Depuis octobre 2025, l'importation de poussins de chair est suspendue pour encourager la production locale. Si tu vends en gros ou à des restaurants, renseigne-toi auprès de la DGSV ou d'un agent vétérinaire local sur les exigences actuelles (certificat sanitaire, normes d'hygiène du point de vente) — ces règles évoluent, donc vérifie l'information la plus récente avant de t'engager dans une vente en volume."},
+
+  // --- COOPÉRATIVE D'ÉLEVEURS ---
+  {cat:"Économie & gestion", niveau:'debutant', titre:"🤝 Se regrouper entre éleveurs",
+   texte:"Mutualiser les achats d'aliment ou de poussins avec d'autres éleveurs du quartier permet souvent d'obtenir de meilleurs prix de gros. Une vente groupée (plusieurs éleveurs qui livrent ensemble un gros client comme un restaurant) donne aussi plus de poids de négociation qu'un éleveur seul. Vu ton expérience avec le GFA, une structure coopérative légère (même informelle au départ) entre éleveurs voisins peut être un vrai levier de croissance."},
+  {cat:"Économie & gestion", niveau:'expert', titre:"Structurer une coopérative d'éleveurs",
+   texte:"Si le regroupement prend de l'ampleur, les mêmes principes que ton GFA (statuts SCOOPS sous OHADA, règlement intérieur, PV constitutif) peuvent s'appliquer à un groupement d'éleveurs avicoles — mutualisation des achats d'intrants, négociation groupée des ventes, partage des coûts de transport vers les gros clients."},
+
+  {cat:"Économie & gestion", niveau:'debutant', titre:"Comment agrandir son élevage progressivement",
+   texte:"Ne grossis pas trop vite : élargis un lot à la fois, réinvestis une partie de chaque bénéfice dans le lot suivant plutôt que de tout dépenser, et n'augmente le nombre de têtes que quand ton espace et ton temps disponible le permettent réellement. Beaucoup d'éleveurs échouent en grossissant plus vite que leur capacité de gestion."},
+  {cat:"Économie & gestion", niveau:'expert', titre:"Stratégie de croissance par paliers",
+   texte:"Un rythme réaliste : stabilise un premier lot sur 2-3 cycles complets pour maîtriser mortalité et FCR, puis double la taille du lot suivant seulement si la marge du cycle précédent était positive. Diversifie ensuite (ajout de pondeuses, autre race) plutôt que de multiplier uniquement le volume, pour répartir les risques sanitaires et de marché."},
+
+  // --- ŒUFS, COUVEUSES & INCUBATION ---
+  {cat:"🥚 Œufs, couveuses & reproduction", niveau:'debutant', titre:"Choisir de bons œufs à couver",
+   texte:"Œuf de forme normale (ni trop rond ni trop allongé), coquille propre et intacte (pas fêlée, pas lavée à l'eau qui enlève la protection naturelle), taille moyenne à normale pour la race, pondu depuis moins de 7 jours et stocké pointe vers le bas à température ambiante fraîche (pas au réfrigérateur). Un œuf trop vieux ou sale a un taux d'éclosion bien plus faible."},
+  {cat:"🥚 Œufs, couveuses & reproduction", niveau:'debutant', titre:"Vérifier qu'un œuf est fécondé (mirage)",
+   texte:"Après 7-10 jours d'incubation, place l'œuf devant une source de lumière forte dans le noir (lampe torche/téléphone) : un œuf fécondé en développement montre des veines rouges et une tache sombre qui bouge ; un œuf clair et vide n'a pas été fécondé ou ne s'est pas développé — retire-le pour éviter qu'il ne pourrisse et contamine les autres."},
+  {cat:"🥚 Œufs, couveuses & reproduction", niveau:'debutant', titre:"Construire une couveuse artisanale simple", svg:'couveuse',
+   texte:"Matériel de base : une caisse en bois ou un carton épais isolé (polystyrène collé à l'intérieur), une ou deux ampoules à incandescence 25-40W comme source de chaleur (pas de LED, qui ne chauffe pas), un thermomètre placé au niveau des œufs, un petit récipient d'eau pour l'humidité, et une grille ou clayette pour poser les œufs sans qu'ils touchent directement le fond."},
+  {cat:"🥚 Œufs, couveuses & reproduction", niveau:'expert', titre:"Réglages précis de la couveuse artisanale",
+   texte:"Température cible : 37,5°C stable (vérifie 2-3 fois par jour, ajuste la distance de l'ampoule si besoin). Humidité : place un petit bac d'eau dans la couveuse, augmente sa surface les 3 derniers jours avant éclosion pour faciliter la sortie du poussin. Retournement : tourne chaque œuf à la main 3 à 5 fois par jour jusqu'au 18ème jour, puis arrête complètement les 3 derniers jours pour laisser le poussin se positionner pour l'éclosion."},
+  {cat:"🥚 Œufs, couveuses & reproduction", niveau:'debutant', titre:"Calendrier d'incubation jour par jour",
+   texte:"Jour 1 : mise en place des œufs propres et fécondés. Jours 1-18 : retournement régulier, température stable, mirage possible dès J7-10 pour retirer les œufs clairs. Jours 18-21 : arrêt du retournement, augmentation légère de l'humidité, ne plus ouvrir la couveuse inutilement. Jour 21 : éclosion (peut s'étaler sur 24-48h) — laisse les poussins sécher dans la couveuse avant de les sortir."},
+  {cat:"🥚 Œufs, couveuses & reproduction", niveau:'debutant', titre:"Couvaison naturelle par une poule",
+   texte:"Une poule qui couve (comportement instinctif, surtout chez le poulet local) peut couver 8 à 15 œufs sans aucun équipement. Installe-la dans un endroit calme et à l'écart du reste du troupeau, avec eau et aliment à proximité immédiate car elle quitte peu le nid. Avantage : zéro investissement et gestion naturelle de la température/humidité. Inconvénient : elle arrête de pondre pendant toute la couvaison."},
+
+  // --- ENTRETIEN DES POUSSINS ---
+  {cat:"🥚 Œufs, couveuses & reproduction", niveau:'debutant', titre:"Checklist des 7 premiers jours du poussin",
+   texte:"Jour de l'éclosion : laisser sécher au chaud avant de manipuler, pas d'aliment nécessaire les 24 premières heures (réserves du jaune). Dès le 2ème jour : eau propre et tiède à disposition en permanence, aliment démarrage en miettes fines, température de la poussinière à 32-35°C. Observe le comportement : des poussins qui se regroupent en tas piaillent = ils ont froid ; des poussins qui s'écartent du point chaud = ils ont trop chaud."},
+  {cat:"🥚 Œufs, couveuses & reproduction", niveau:'debutant', titre:"Réduire la chaleur progressivement",
+   texte:"Diminue la température de la poussinière d'environ 2-3°C par semaine : 32-35°C semaine 1, puis 29-32°C semaine 2, 26-29°C semaine 3, jusqu'à température ambiante normale vers 4-5 semaines si le climat le permet. Une transition trop brutale stresse les poussins et augmente le risque de maladie."},
+  {cat:"🥚 Œufs, couveuses & reproduction", niveau:'debutant', titre:"Signes d'alerte chez le poussin",
+   texte:"Léthargie, yeux fermés ou mi-clos, plumes ébouriffées en permanence, refus de manger/boire, diarrhée collante autour du cloaque, respiration difficile ou bruyante. Isole immédiatement tout poussin montrant ces signes du reste du lot pour éviter la propagation."},
+
+  // --- REPRODUCTION & REPRODUCTEURS RÉSISTANTS ---
+  {cat:"Races & génétique", niveau:'debutant', titre:"Choisir ses reproducteurs (coq et poules)",
+   texte:"Sélectionne des sujets qui n'ont jamais été malades sur le lot, à croissance rapide et régulière, sans défaut visible (pattes droites, plumage complet, yeux vifs), et issus si possible de parents différents pour éviter la consanguinité. Pour les poules, privilégie celles qui pondent régulièrement et montrent un bon instinct de couvaison si tu veux de la reproduction naturelle."},
+  {cat:"Races & génétique", niveau:'expert', titre:"Ratio coq / poules pour la reproduction", svg:'ratio',
+   texte:"Pour une bonne fécondité, compte environ 1 coq pour 8 à 12 poules en poulet local, et 1 coq pour 10 à 15 poules pour le Kuroiler. Trop de coqs entraîne du stress et des blessures entre poules ; pas assez réduit le taux de fécondation des œufs."},
+  {cat:"Races & génétique", niveau:'expert', titre:"Cycle complet de reproduction",
+   texte:"Ponte fécondée (après accouplement) → sélection des œufs à couver (voir ci-dessus) → incubation 21 jours (couveuse ou couvaison naturelle) → éclosion → poussins → à partir de 5-6 mois pour le poulet local (un peu plus tôt pour le Kuroiler), les jeunes poules commencent à pondre et le cycle peut recommencer avec la génération suivante si tu gardes les meilleurs sujets comme futurs reproducteurs."},
+  {cat:"Races & génétique", niveau:'debutant', titre:"Renouveler le sang régulièrement",
+   texte:"Après 2-3 générations reproduites en circuit fermé, introduis un nouveau coq (ou une nouvelle poule) venant d'un autre élevage pour éviter la consanguinité, qui affaiblit progressivement la résistance et la croissance de tes lots. C'est un point souvent négligé mais essentiel pour garder une souche locale résistante sur le long terme."},
+
+  // --- POULET DU FASO ---
+  {cat:"Races & génétique", niveau:'debutant', titre:"Le Poulet du Faso : le meilleur des deux mondes",
+   texte:"Le Poulet du Faso est un croisement entre un coq de race locale (poulet bicyclette) et une poule Sasso (race rustique française), développé au Burkina Faso depuis 2015 par Ceva Santé Animale et Sasso, avec un centre de sélection basé à Boussé. L'objectif : garder l'apparence, le goût et la rusticité du poulet local tout en améliorant nettement ses performances grâce à la lignée Sasso."},
+  {cat:"Races & génétique", niveau:'expert', titre:"Performances chiffrées du Poulet du Faso",
+   texte:"Selon les données du programme, le taux de mortalité du Poulet du Faso descend autour de 5%, contre environ 50% pour les lignées traditionnelles non améliorées — une différence considérable. Sa croissance est aussi plus rapide qu'un poulet bicyclette pur (environ un mois de moins pour atteindre le poids de commercialisation), et la capacité de ponte s'est nettement améliorée au fil des générations de sélection."},
+  {cat:"Races & génétique", niveau:'debutant', titre:"Reconnaître un Poulet du Faso",
+   texte:"Le Poulet du Faso garde le plumage et l'apparence générale du poulet local — ce n'est pas une race étrangère qui dénature le phénotype traditionnel. Dans la filière officielle, chaque sujet porte une bague d'identification à l'aile pour assurer la traçabilité jusqu'à la vente."},
+  {cat:"Races & génétique", niveau:'expert', titre:"Poulet du Faso vs Kuroiler vs poulet local",
+   texte:"Le poulet local reste le plus rustique et le moins cher à démarrer, mais le plus lent et le plus fragile face aux maladies. Le Kuroiler pousse vite et pond bien, mais reste un hybride importé. Le Poulet du Faso se positionne entre les deux : croissance et résistance nettement améliorées tout en gardant l'apparence et le goût recherchés du poulet local sur le marché burkinabè — un bon compromis si tu peux te procurer des sujets ou œufs certifiés auprès de la filière."},
+
+  // --- DINDONS & PINTADES ---
+  {cat:"🦃 Dindons & pintades", niveau:'debutant', titre:"Le dindon : cycle et particularités",
+   texte:"Incubation : 28 jours (contre 21 pour le poulet). Une dinde couve naturellement 15 à 20 œufs (contre 8-12 pour une poule). L'œuf de dinde est plus lourd (70-95g) que l'œuf de poule. Le dindonneau est un animal maladroit et fragile, surtout sensible à l'humidité — il lui faut un local bien sec, chaud et lumineux."},
+  {cat:"🦃 Dindons & pintades", niveau:'expert', titre:"⚠️ La \"crise du rouge\" chez le dindonneau",
+   texte:"Vers 8-16 semaines, le dindonneau traverse une période comparable à une crise pubertaire : les caroncules charnues du cou se développent, l'animal s'affaiblit et devient particulièrement sensible aux maladies (notamment l'histomonose). Pendant cette période : garde-le au chaud, au sec, sans stress, jamais sans eau ni nourriture, et ne le sors que par temps sec."},
+  {cat:"🦃 Dindons & pintades", niveau:'expert', titre:"Histomonose : la règle d'or à connaître",
+   texte:"C'est la maladie la plus dangereuse pour le dindon (jusqu'à 70-100% de mortalité). Elle se transmet via un ver intestinal (Heterakis) que le poulet héberge souvent sans aucun symptôme. Règle absolue : ne jamais élever dindons et poulets sur le même parcours ou la même litière. Vermifuge régulièrement tout le cheptel. Voir le guide des maladies (onglet Santé) pour le détail complet."},
+  {cat:"🦃 Dindons & pintades", niveau:'debutant', titre:"La pintade locale au Burkina : une tradition vivante",
+   texte:"La pintade locale est la 2ème espèce avicole du pays après le poulet, avec un cheptel estimé à plus de 6,5 millions de têtes. Ses produits (œufs, pintadeaux, adultes) servent à la vente, la reproduction, les dons, l'autoconsommation, et même certains usages socioculturels traditionnels (sacrifices). C'est un élevage historiquement peu coûteux à démarrer et à cycle court."},
+  {cat:"🦃 Dindons & pintades", niveau:'expert', titre:"Reproduction de la pintade : ratio et incubation",
+   texte:"Respecte un ratio maximum de 2 femelles pour 1 mâle pour une bonne fécondité des œufs. Point important : la pintade locale a une aptitude à couver assez faible et son taux d'éclosion réel reste souvent modeste (autour de 55-65% en conditions villageoises) — beaucoup d'éleveurs confient les œufs de pintade à une poule couveuse plutôt qu'à la pintade elle-même, qui incube moins bien."},
+  {cat:"🦃 Dindons & pintades", niveau:'debutant', titre:"⚠️ Le point faible : les pintadeaux ont très froid",
+   texte:"Les pintadeaux sont naturellement très frileux, pourtant l'habitat traditionnel villageois ne prévoit presque jamais de chauffage pour eux — c'est l'une des causes principales de leur forte mortalité. Un point d'amélioration simple et à fort impact : installe une source de chaleur (ampoule) les 2-3 premières semaines, comme pour les poussins de poulet, même si ce n'est pas la pratique traditionnelle."},
+  {cat:"🦃 Dindons & pintades", niveau:'debutant', titre:"Alimentation naturelle de la pintade",
+   texte:"La pintade est une excellente fourrageuse : elle recherche activement insectes, termites et graines au sol, ce qui en fait un allié naturel contre certains nuisibles du jardin ou du champ. Les asticots séchés sont bien acceptés comme complément protéiné, exactement comme pour le poulet local (voir l'onglet 🌿 Naturel)."},
+  {cat:"🦃 Dindons & pintades", niveau:'expert', titre:"Saisonnalité de l'élevage de la pintade",
+   texte:"Traditionnellement, l'élevage de la pintade est plus favorable en saison des pluies qu'en saison sèche, la ponte et la survie des pintadeaux étant meilleures quand les ressources naturelles (insectes, verdure) sont abondantes. Planifie tes mises en incubation en conséquence si tu veux limiter la mortalité."},
+  {cat:"🦃 Dindons & pintades", niveau:'debutant', titre:"Dindon et pintade dans l'application",
+   texte:"Ajoute \"Dindon\" ou \"Pintade\" comme race lors de la création d'un nouveau lot — ces deux espèces sont déjà proposées par défaut. Le suivi de croissance s'adapte automatiquement à leur cycle plus long (150 jours pour le dindon, 110 pour la pintade, contre 90 pour le poulet)."},
+
+  // --- PARCOURS DU DÉBUTANT COMPLET ---
+  {cat:"🗺️ Parcours du débutant total", niveau:'debutant', titre:"Étape 0 — Avant de commencer",
+   texte:"Choisis d'abord ta race selon ton objectif : Kuroiler pour la croissance rapide et le volume, poulet local pour la résistance et la valeur traditionnelle, pintade si tu as un espace de parcours (excellente fourrageuse), dindon seulement si tu peux le séparer totalement des poulets. Définis un budget de départ réaliste et repère l'endroit où tu vas installer ton poulailler (sec, drainé, à l'écart des habitations)."},
+  {cat:"🗺️ Parcours du débutant total", niveau:'debutant', titre:"Étape 1 — Construire un abri minimal",
+   texte:"Pas besoin d'un grand bâtiment pour commencer : un petit abri sec, à l'épreuve des prédateurs (grillage bien fermé), avec une toiture qui ne fuit pas, suffit pour démarrer avec 10-20 têtes. Voir 🏗️ Construction & infrastructure pour les dimensions précises."},
+  {cat:"🗺️ Parcours du débutant total", niveau:'debutant', titre:"Étape 2 — Se procurer des poussins ou œufs sains",
+   texte:"Achète chez un fournisseur qui a bonne réputation localement, inspecte les poussins (yeux vifs, pattes droites, pas de diarrhée), ou choisis tes œufs à couver selon les critères de fraîcheur et de propreté (voir 🥚 Œufs, couveuses & reproduction). Commence petit (10-20 têtes) pour ton premier lot."},
+  {cat:"🗺️ Parcours du débutant total", niveau:'debutant', titre:"Étape 3 — Les 3 premières semaines, la période critique",
+   texte:"C'est la période où tu perds le plus de sujets si tu n'es pas rigoureux : chauffage adapté, eau propre en permanence, aliment démarrage, observation quotidienne. Enregistre ton lot dans l'application dès le premier jour pour commencer le suivi d'âge et de croissance."},
+  {cat:"🗺️ Parcours du débutant total", niveau:'debutant', titre:"Étape 4 — Suivi santé et croissance sur la durée",
+   texte:"Pèse ton lot chaque semaine (onglet Rapports), note toute vaccination ou traitement dans le carnet sanitaire, surveille les alertes vaccinales automatiques du tableau de bord. La régularité du suivi est ce qui distingue un élevage professionnel d'un élevage livré au hasard."},
+  {cat:"🗺️ Parcours du débutant total", niveau:'debutant', titre:"Étape 5 — Ta première vente",
+   texte:"Avant de vendre, regarde le bloc \"Rentabilité en direct\" sur la carte de ton lot (onglet Lots) : il te donne déjà ton coût de revient réel et un prix de vente suggéré avec marge. Utilise-le comme base de négociation plutôt que de fixer un prix au hasard."},
+  {cat:"🗺️ Parcours du débutant total", niveau:'debutant', titre:"Étape 6 — Reproduire ou renouveler",
+   texte:"Si ton premier cycle a été positif (marge bénéficiaire réelle, mortalité raisonnable), tu peux soit relancer un lot similaire, soit commencer à sélectionner tes meilleurs sujets comme futurs reproducteurs (voir Races & génétique). Ne grossis pas plus vite que ta capacité réelle à gérer et à financer le lot suivant."},
+
+  // --- ERREURS CLASSIQUES À ÉVITER ---
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Ne pas mettre en quarantaine un nouvel animal",
+   texte:"Erreur très fréquente : intégrer directement un poussin ou une poule achetée au reste du troupeau. Une seule semaine d'isolement peut t'éviter de contaminer tout ton élevage avec une maladie que l'animal couvait sans le montrer encore."},
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Mélanger dindons et poulets",
+   texte:"Erreur potentiellement mortelle pour tes dindons : les élever sur le même parcours que des poulets expose au risque d'histomonose, une maladie que le poulet porte souvent sans symptôme mais qui peut tuer la quasi-totalité d'un lot de dindons."},
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Changer l'aliment brutalement",
+   texte:"Passer d'un coup d'un aliment à un autre (ou d'un aliment industriel à une ration maison) perturbe la digestion et peut provoquer diarrhée et perte de croissance. Introduis toujours un changement d'alimentation progressivement sur plusieurs jours."},
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Négliger la vaccination de démarrage",
+   texte:"Beaucoup de pertes évitables viennent du fait de repousser ou d'oublier la première vaccination (Newcastle notamment). L'appli t'affiche des alertes automatiques sur le tableau de bord — ne les ignore pas."},
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Construire un poulailler trop petit dès le départ",
+   texte:"Beaucoup d'éleveurs sous-dimensionnent leur premier poulailler pour économiser, puis doivent agrandir dans l'urgence en pleine croissance du lot — ce qui coûte souvent plus cher au final que de prévoir un peu plus large dès le début."},
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Ne pas noter ses dépenses",
+   texte:"Acheter de l'aliment ou des poussins sans les enregistrer immédiatement dans l'application fait perdre la trace du vrai coût de revient — tu risques de vendre à perte sans t'en rendre compte. Prends l'habitude de tout saisir le jour même."},
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Grossir trop vite",
+   texte:"Doubler ou tripler la taille de son élevage avant d'avoir stabilisé la gestion d'un premier lot (mortalité maîtrisée, rentabilité positive) est l'une des causes principales d'échec des nouveaux éleveurs. Stabilise d'abord, grossis ensuite."},
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Négliger l'eau",
+   texte:"Une eau sale, insuffisante ou qui vient à manquer même quelques heures peut suffire à stresser tout un lot et ouvrir la porte aux maladies. C'est souvent le facteur le plus sous-estimé par les débutants."},
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Garder les mêmes reproducteurs indéfiniment",
+   texte:"Faire reproduire les mêmes coqs et poules génération après génération sans jamais renouveler le sang affaiblit progressivement la résistance et la croissance de tes lots (consanguinité) — un problème qui n'apparaît pas tout de suite mais qui s'installe silencieusement."},
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Laver les œufs avant incubation",
+   texte:"Un œuf à couver ne doit jamais être lavé à l'eau : cela retire la fine pellicule protectrice naturelle de la coquille et augmente le risque de contamination pendant l'incubation. Un œuf sale mais non lavé vaut mieux qu'un œuf lavé pour la couvaison."},
+  {cat:"🚦 Erreurs classiques à éviter", niveau:'debutant', titre:"Ne jamais sauvegarder ses données",
+   texte:"Toutes tes données restent uniquement sur ce téléphone. Sans sauvegarde régulière (Rapports → Télécharger la sauvegarde), un téléphone perdu ou cassé signifie perdre tout l'historique de ton élevage — lots, ventes, carnet sanitaire, tout."},
+];
+// ==================== SCHÉMAS SVG (illustrations 100% offline) ====================
+const DIAGRAMS = {
+  cycle: `<svg viewBox="0 0 300 140" width="100%" height="130">
+    <circle cx="45" cy="70" r="30" fill="#fde0d0"/><text x="45" y="65" font-size="20" text-anchor="middle">🥚</text><text x="45" y="112" font-size="9" text-anchor="middle" fill="#495057">Œuf (21j)</text>
+    <circle cx="130" cy="70" r="30" fill="#fff3cd"/><text x="130" y="65" font-size="20" text-anchor="middle">🐣</text><text x="130" y="112" font-size="9" text-anchor="middle" fill="#495057">Poussin</text>
+    <circle cx="215" cy="70" r="30" fill="#d8f3dc"/><text x="215" y="65" font-size="20" text-anchor="middle">🐤</text><text x="215" y="112" font-size="9" text-anchor="middle" fill="#495057">Croissance</text>
+    <circle cx="270" cy="70" r="25" fill="#95d5b2"/><text x="270" y="65" font-size="18" text-anchor="middle">🐔</text><text x="270" y="112" font-size="8" text-anchor="middle" fill="#495057">Adulte</text>
+    <path d="M75,70 H100" stroke="#6c757d" stroke-width="2" marker-end="url(#arr)"/>
+    <path d="M160,70 H185" stroke="#6c757d" stroke-width="2" marker-end="url(#arr)"/>
+    <path d="M245,70 H245" stroke="#6c757d" stroke-width="2"/>
+    <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6c757d"/></marker></defs>
+  </svg>`,
+  couveuse: `<svg viewBox="0 0 300 160" width="100%" height="150">
+    <rect x="20" y="20" width="260" height="120" rx="8" fill="none" stroke="#2d6a4f" stroke-width="2"/>
+    <text x="150" y="14" font-size="9" text-anchor="middle" fill="#495057">Coupe d'une couveuse artisanale</text>
+    <circle cx="60" cy="45" r="10" fill="#f77f00"/><text x="60" y="49" font-size="10" text-anchor="middle">💡</text>
+    <text x="60" y="70" font-size="7" text-anchor="middle" fill="#495057">Ampoule</text>
+    <text x="60" y="80" font-size="7" text-anchor="middle" fill="#495057">25-40W</text>
+    <rect x="110" y="95" width="80" height="18" rx="3" fill="#e9ecef" stroke="#adb5bd"/>
+    <text x="150" y="107" font-size="14" text-anchor="middle">🥚🥚🥚</text>
+    <text x="150" y="122" font-size="7" text-anchor="middle" fill="#495057">Grille à œufs</text>
+    <rect x="220" y="105" width="30" height="20" rx="3" fill="#a8dadc" stroke="#264653"/>
+    <text x="235" y="119" font-size="9" text-anchor="middle">💧</text>
+    <text x="235" y="135" font-size="7" text-anchor="middle" fill="#495057">Eau (humidité)</text>
+    <rect x="255" y="30" width="18" height="30" rx="2" fill="#fff" stroke="#d62828"/>
+    <text x="264" y="50" font-size="8" text-anchor="middle" fill="#d62828">37,5°C</text>
+  </svg>`,
+  poulailler: `<svg viewBox="0 0 300 150" width="100%" height="140">
+    <text x="150" y="14" font-size="9" text-anchor="middle" fill="#495057">Coupe simplifiée d'un poulailler</text>
+    <polygon points="40,60 150,25 260,60" fill="#e76f51"/>
+    <rect x="50" y="60" width="200" height="70" fill="#f1e3c8" stroke="#7f5539" stroke-width="2"/>
+    <rect x="70" y="80" width="30" height="30" fill="#a8dadc" stroke="#264653"/>
+    <text x="85" y="100" font-size="14" text-anchor="middle">🌬️</text>
+    <rect x="200" y="80" width="30" height="30" fill="#a8dadc" stroke="#264653"/>
+    <text x="215" y="100" font-size="14" text-anchor="middle">🌬️</text>
+    <text x="150" y="105" font-size="16" text-anchor="middle">🐔🐔🐔</text>
+    <text x="150" y="142" font-size="8" text-anchor="middle" fill="#495057">Débord de toit + ouvertures ventilées des 2 côtés</text>
+  </svg>`,
+  biosecurite: `<svg viewBox="0 0 260 260" width="100%" height="220">
+    <circle cx="130" cy="130" r="110" fill="#fde0d0" stroke="#e76f51" stroke-width="1.5"/>
+    <circle cx="130" cy="130" r="70" fill="#fff3cd" stroke="#f77f00" stroke-width="1.5"/>
+    <circle cx="130" cy="130" r="35" fill="#d8f3dc" stroke="#2d6a4f" stroke-width="1.5"/>
+    <text x="130" y="134" font-size="18" text-anchor="middle">🐔</text>
+    <text x="130" y="105" font-size="7" text-anchor="middle" fill="#1b4332">Zone propre</text>
+    <text x="130" y="65" font-size="7" text-anchor="middle" fill="#7c4a00">Zone tampon</text>
+    <text x="130" y="30" font-size="7" text-anchor="middle" fill="#7c2d12">Zone extérieure / public</text>
+  </svg>`,
+  ratio: `<svg viewBox="0 0 300 90" width="100%" height="85">
+    <text x="10" y="20" font-size="18">🐓</text>
+    <text x="35" y="18" font-size="9" fill="#495057">1 coq pour...</text>
+    <text x="10" y="55" font-size="14">🐔🐔🐔🐔🐔</text>
+    <text x="10" y="75" font-size="14">🐔🐔🐔🐔🐔</text>
+    <text x="140" y="45" font-size="8" fill="#495057">8-12 poules</text>
+    <text x="140" y="58" font-size="8" fill="#495057">(poulet local)</text>
+    <text x="140" y="75" font-size="8" fill="#495057">10-15 (Kuroiler)</text>
+  </svg>`
+};
+function diagramHTML(key){
+  if(!key || !DIAGRAMS[key]) return '';
+  return `<div style="background:#f8f9fa; border-radius:8px; padding:6px; margin:8px 0;">${DIAGRAMS[key]}</div>`;
+}
+
+function setEncycloLevel(lvl){
+  encycloLevel = lvl;
+  document.getElementById('levelBtnDebutant').className = lvl==='debutant' ? 'btn small' : 'btn small outline';
+  document.getElementById('levelBtnExpert').className = lvl==='expert' ? 'btn small' : 'btn small outline';
+  renderEncyclo();
+}
+function renderEncyclo(){
+  const searchEl = document.getElementById('encycloSearch');
+  const q = (searchEl ? searchEl.value : '').toLowerCase().trim();
+  const filtered = ENCYCLOPEDIA.filter(a=>{
+    const levelOk = a.niveau==='tous' || a.niveau===encycloLevel;
+    if(!levelOk) return false;
+    if(!q) return true;
+    return (a.titre+' '+a.texte+' '+a.cat).toLowerCase().includes(q);
+  });
+  const wrap = document.getElementById('encycloContent');
+  if(!wrap) return;
+  if(filtered.length===0){ wrap.innerHTML = '<div class="empty">Aucun résultat pour cette recherche.</div>'; return; }
+  const cats = [...new Set(filtered.map(a=>a.cat))];
+  wrap.innerHTML = cats.map(cat=>`
+    <div class="section-title" style="font-size:0.85rem; margin-top:14px;">${cat}</div>
+    ${filtered.filter(a=>a.cat===cat).map(a=>`
+      <div class="info-card natural">
+        <h4>${a.niveau==='expert'?'🎓':a.niveau==='debutant'?'🌱':'📌'} ${a.titre}</h4>
+        ${diagramHTML(a.svg)}
+        <p style="font-size:0.82rem; line-height:1.4;">${a.texte}</p>
+      </div>`).join('')}
+  `).join('');
+}
+
+function bpCard(title, text){
+  return `<div class="info-card natural"><h4>✅ ${title}</h4><p style="font-size:0.82rem; line-height:1.4;">${text}</p></div>`;
+}
+function renderBestPractices(){
+  const cmp = document.getElementById('bpCompare');
+  if(!cmp) return;
+  cmp.innerHTML = BP_COMPARE.map(c=>`
+    <div class="info-card">
+      <h4 style="color:var(--vert-fonce);">${c.critere}</h4>
+      <div class="dsec"><div class="dlabel">Kuroiler</div><p>${c.kuroiler}</p></div>
+      <div class="dsec"><div class="dlabel">Poulet local</div><p>${c.local}</p></div>
+      <div class="dsec"><div class="dlabel">Poulet du Faso</div><p>${c.faso}</p></div>
+    </div>`).join('');
+  document.getElementById('bpStages').innerHTML = BP_STAGES.map(s=>bpCard(s.titre, s.texte)).join('');
+  document.getElementById('bpHousing').innerHTML = BP_HOUSING.map(s=>bpCard(s.titre, s.texte)).join('');
+  document.getElementById('bpBreeding').innerHTML = BP_BREEDING.map(s=>bpCard(s.titre, s.texte)).join('');
+  document.getElementById('bpHygiene').innerHTML = BP_HYGIENE.map(s=>bpCard(s.titre, s.texte)).join('');
+  document.getElementById('bpSales').innerHTML = BP_SALES.map(s=>bpCard(s.titre, s.texte)).join('');
+}
+
+// ==================== COÛT DE REVIENT & PRIX DE VENTE ====================
+function calcCoutRevient(lotId){
+  const lot = lots.find(l=>l.id===lotId);
+  if(!lot) return null;
+  const coutPoussins = lot.cout * lot.qtyInitiale;
+  const coutAliment = feed.filter(f=>f.type==='sortie' && f.lotId===lotId).reduce((s,f)=>s+f.cout,0);
+  const coutSante = health.filter(h=>h.lotId===lotId).reduce((s,h)=>s+(h.cout||0),0);
+  const coutTotal = coutPoussins + coutAliment + coutSante;
+  const qtyRestante = Math.max(1, lot.qtyActuelle);
+  const coutUnitaire = coutTotal / qtyRestante;
+  return {lot, coutPoussins, coutAliment, coutSante, coutTotal, qtyRestante, coutUnitaire};
+}
+function renderCoutRevient(){
+  const lotId = document.getElementById('calcLot')?.value;
+  const detailEl = document.getElementById('coutRevientDetail');
+  const prixEl = document.getElementById('prixSuggere');
+  if(!detailEl || !prixEl) return;
+  if(!lotId){ detailEl.innerHTML = '<div class="empty">Sélectionne un lot.</div>'; prixEl.innerHTML=''; return; }
+  const r = calcCoutRevient(lotId);
+  if(!r){ detailEl.innerHTML=''; prixEl.innerHTML=''; return; }
+  detailEl.innerHTML = `
+    <div style="font-size:0.8rem; line-height:1.7; margin-top:8px;">
+      🐣 Poussins/œufs : <b>${fmt(r.coutPoussins)} ${devise()}</b><br>
+      🌾 Aliment distribué à ce lot : <b>${fmt(r.coutAliment)} ${devise()}</b><br>
+      💊 Santé (vaccins/traitements chiffrés) : <b>${fmt(r.coutSante)} ${devise()}</b><br>
+      <div style="border-top:1px solid #e9ecef; margin:6px 0;"></div>
+      💰 <b>Coût total du lot : ${fmt(r.coutTotal)} ${devise()}</b><br>
+      🐔 Têtes restantes à vendre : <b>${r.qtyRestante}</b><br>
+      📊 <b>Coût de revient par tête : ${fmt(r.coutUnitaire)} ${devise()}</b>
+    </div>`;
+  const marge = parseFloat(document.getElementById('calcMarge').value)||0;
+  const prixSuggere = r.coutUnitaire * (1 + marge/100);
+  const beneficeUnitaire = prixSuggere - r.coutUnitaire;
+  prixEl.innerHTML = `
+    <div class="chart-box" style="margin-top:10px; background:#e8f3ee;">
+      <div style="font-size:0.85rem;">✅ <b>Prix de vente suggéré : ${fmt(prixSuggere)} ${devise()} / tête</b></div>
+      <div style="font-size:0.75rem; color:var(--gris); margin-top:4px;">Bénéfice par tête : ${fmt(beneficeUnitaire)} ${devise()} · Bénéfice total estimé (${r.qtyRestante} têtes) : ${fmt(beneficeUnitaire*r.qtyRestante)} ${devise()}</div>
+      <button class="btn small bleu" style="margin-top:8px;" onclick="applyPrixSuggere(${prixSuggere})">Utiliser ce prix pour la prochaine vente</button>
+    </div>`;
+}
+function applyPrixSuggere(prix){
+  settings.prixVentePoulet = Math.round(prix);
+  DB.set(KEYS.settings, settings);
+  alert('Prix de vente par défaut mis à jour : '+fmt(prix)+' '+devise()+'. Il sera pré-rempli à la prochaine vente.');
+}
+
+// ==================== ALERTES VACCINALES ====================
+const VACCINE_SCHEDULE = [
+  {jour:1, nom:"Newcastle (primo)"},
+  {jour:14, nom:"Gumboro"},
+  {jour:21, nom:"Newcastle (rappel)"},
+  {jour:42, nom:"Variole aviaire"}
+];
+function getVaccineAlerts(){
+  const alerts = [];
+  lots.forEach(lot=>{
+    const age = ageJours(lot.date);
+    const lotHealth = health.filter(h=>h.lotId===lot.id && h.type==='vaccin');
+    VACCINE_SCHEDULE.forEach(v=>{
+      const done = lotHealth.some(h=>h.desc.toLowerCase().includes(v.nom.toLowerCase().split(' ')[0]));
+      if(done) return;
+      if(age >= v.jour + 7){
+        alerts.push({lotId:lot.id, lot, vaccin:v.nom, status:'overdue', age});
+      } else if(age >= v.jour - 3 && age < v.jour + 7){
+        alerts.push({lotId:lot.id, lot, vaccin:v.nom, status:'due', age});
+      }
+    });
+  });
+  return alerts;
+}
+function renderVaccineAlerts(){
+  const el = document.getElementById('vaccineAlerts');
+  if(!el) return;
+  const alerts = getVaccineAlerts();
+  if(alerts.length===0){ el.innerHTML=''; return; }
+  el.innerHTML = alerts.map(a=>`
+    <div class="list-item" style="border-left:4px solid ${a.status==='overdue'?'#d62828':'#f77f00'};">
+      <div><div class="li-main">${a.status==='overdue'?'🔴':'🟠'} ${a.vaccin} — ${a.lot.type}</div><div class="li-sub">${lotLabel(a.lotId)} · ${a.age}j · ${a.status==='overdue'?'En retard':'À faire bientôt'}</div></div>
+    </div>`).join('');
+}
+
+// ==================== PONTE QUOTIDIENNE ====================
+function openEggModal(){ document.getElementById('eggDate').value = today(); fillLotSelects(); document.getElementById('modalEgg').classList.add('active'); }
+function saveEgg(){
+  const lotId = document.getElementById('eggLot').value;
+  const qty = parseInt(document.getElementById('eggQty').value)||0;
+  const loss = parseInt(document.getElementById('eggLoss').value)||0;
+  if(qty<0){ alert("Indique un nombre valide."); return; }
+  eggs.push({id:uid(), lotId, date:document.getElementById('eggDate').value||today(), qty, loss});
+  DB.set(KEYS.eggs, eggs);
+  logAction(`Ponte enregistrée: ${qty} œufs (${loss} perdus)`);
+  ['eggQty','eggLoss'].forEach(id=>document.getElementById(id).value='');
+  closeModal('modalEgg'); renderAll();
+}
+function renderEggs(){
+  const totalPondus = eggs.reduce((s,e)=>s+e.qty,0);
+  const totalPertes = eggs.reduce((s,e)=>s+e.loss,0);
+  const totalVendus = sales.filter(v=>v.type==='oeufs').reduce((s,v)=>s+v.qty,0);
+  const stock = totalPondus - totalPertes - totalVendus;
+  document.getElementById('eggStock').textContent = fmt(Math.max(0,stock));
+  const last7 = eggs.filter(e=>ageJours(e.date) <= 7);
+  const moy7 = last7.length ? (last7.reduce((s,e)=>s+e.qty,0)/last7.length) : 0;
+  const pondeuses = lots.filter(l=>ageJours(l.date) > 120).reduce((s,l)=>s+l.qtyActuelle,0) || 1;
+  document.getElementById('eggRate').textContent = Math.min(100, Math.round((moy7/pondeuses)*100))+'%';
+  const wrap = document.getElementById('eggList');
+  if(eggs.length===0){ wrap.innerHTML = '<div class="empty">Aucune ponte enregistrée.</div>'; return; }
+  wrap.innerHTML = [...eggs].reverse().slice(0,10).map(e=>`
+    <div class="list-item">
+      <div><div class="li-main">🥚 ${e.qty} œufs ${e.loss?('('+e.loss+' perdus)'):''}</div><div class="li-sub">${e.date} · ${lotLabel(e.lotId)}</div></div>
+    </div>`).join('');
+}
+
+// ==================== CLIENTS & CRÉDIT ====================
+function openClientModal(){ document.getElementById('modalClient').classList.add('active'); }
+function saveClient(){
+  const nom = document.getElementById('clientNom').value.trim();
+  if(!nom){ alert("Indique un nom."); return; }
+  clients.push({id:uid(), nom, tel:document.getElementById('clientTel').value, notes:document.getElementById('clientNotes').value});
+  DB.set(KEYS.clients, clients);
+  ['clientNom','clientTel','clientNotes'].forEach(id=>document.getElementById(id).value='');
+  closeModal('modalClient'); renderAll();
+}
+function clientDue(clientId){
+  const totalCredit = sales.filter(s=>s.clientId===clientId && s.statut==='credit').reduce((s,v)=>s+v.total,0);
+  const totalPaye = payments.filter(p=>p.clientId===clientId).reduce((s,p)=>s+p.montant,0);
+  return Math.max(0, totalCredit - totalPaye);
+}
+function openPayCredit(clientId){
+  document.getElementById('payClientId').value = clientId;
+  document.getElementById('payAmount').value = '';
+  document.getElementById('modalPayCredit').classList.add('active');
+}
+function savePayment(){
+  const clientId = document.getElementById('payClientId').value;
+  const montant = parseFloat(document.getElementById('payAmount').value)||0;
+  if(montant<=0){ alert("Indique un montant valide."); return; }
+  payments.push({id:uid(), clientId, date:today(), montant});
+  DB.set(KEYS.payments, payments);
+  logAction(`Paiement reçu: ${montant} de ${clients.find(c=>c.id===clientId)?.nom||'client'}`);
+  closeModal('modalPayCredit'); renderAll();
+}
+function fillClientSelect(){
+  const el = document.getElementById('saleClient');
+  if(!el) return;
+  el.innerHTML = '<option value="">— Client de passage —</option>' + clients.map(c=>`<option value="${c.id}">${c.nom}</option>`).join('');
+}
+function renderClients(){
+  const wrap = document.getElementById('clientsList');
+  if(!wrap) return;
+  if(clients.length===0){ wrap.innerHTML = '<div class="empty">Aucun client enregistré.</div>'; return; }
+  wrap.innerHTML = clients.map(c=>{
+    const due = clientDue(c.id);
+    return `<div class="list-item">
+      <div><div class="li-main">${c.nom} ${c.tel?('· '+c.tel):''}</div><div class="li-sub">${due>0 ? ('⚠️ Doit: '+fmt(due)+' '+devise()) : 'À jour'}</div></div>
+      ${due>0 ? `<button class="btn small bleu" onclick="openPayCredit('${c.id}')">Encaisser</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ==================== RAPPEL DE SAUVEGARDE ====================
+function checkBackupReminder(){
+  const banner = document.getElementById('installBanner');
+  if(!settings.lastBackup){
+    banner.textContent = "⚠️ Tu n'as jamais fait de sauvegarde ! Va dans Rapports → Télécharger la sauvegarde.";
+    banner.style.display = 'block';
+    return;
+  }
+  const jours = ageJours(settings.lastBackup);
+  if(jours > 14){
+    banner.textContent = `⚠️ Dernière sauvegarde il y a ${jours} jours. Pense à en refaire une (Rapports → Sauvegarde).`;
+    banner.style.display = 'block';
+  }
+}
+
+function fillLotSelects(){
+  const opts = lots.map(l=>`<option value="${l.id}">${l.type} — ${l.date} (${l.qtyActuelle} têtes)</option>`).join('');
+  ['healthLot','saleLot','weightLot','eggLot','calcLot'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = opts || '<option value="">Aucun lot</option>';
+  });
+}
+function openHealthModal(){ document.getElementById('healthDate').value = today(); fillLotSelects(); document.getElementById('modalHealth').classList.add('active'); }
+function saveHealth(){
+  const lotId = document.getElementById('healthLot').value;
+  const desc = document.getElementById('healthDesc').value;
+  const cout = parseFloat(document.getElementById('healthCout').value)||0;
+  if(!desc){ alert("Ajoute une description."); return; }
+  health.push({id:uid(), lotId, type:document.getElementById('healthType').value, date:document.getElementById('healthDate').value||today(), desc, cout});
+  DB.set(KEYS.health, health);
+  document.getElementById('healthDesc').value='';
+  document.getElementById('healthCout').value='';
+  closeModal('modalHealth'); renderAll();
+}
+function lotLabel(lotId){
+  const l = lots.find(x=>x.id===lotId);
+  return l ? l.type+' '+l.date : 'Lot supprimé';
+}
+function renderHealth(){
+  const wrap = document.getElementById('healthList');
+  if(health.length===0){ wrap.innerHTML = '<div class="empty">Aucune entrée sanitaire.</div>'; }
+  else {
+    const icons = {vaccin:'💉', traitement:'🩺', maladie:'🤒', mortalite:'☠️', naturel:'🌿'};
+    wrap.innerHTML = [...health].reverse().map(h=>`
+      <div class="list-item">
+        <div><div class="li-main">${icons[h.type]||''} ${h.desc}</div><div class="li-sub">${h.date} · ${lotLabel(h.lotId)}</div></div>
+        ${h.cout ? `<div class="li-val fin-only">${fmt(h.cout)} ${devise()}</div>` : ''}
+      </div>`).join('');
+  }
+  renderDiseaseGuide();
+  renderNatural();
+}
+
+// ==================== VENTES ====================
+function openSaleModal(){
+  document.getElementById('saleDate').value = today();
+  fillLotSelects();
+  fillClientSelect();
+  document.getElementById('salePrix').value = settings.prixVentePoulet || '';
+  document.getElementById('modalSale').classList.add('active');
+}
+function saveSale(){
+  const qty = parseInt(document.getElementById('saleQty').value)||0;
+  const prix = parseFloat(document.getElementById('salePrix').value)||0;
+  if(qty<=0 || prix<=0){ alert("Vérifie la quantité et le prix."); return; }
+  const lotId = document.getElementById('saleLot').value;
+  const clientId = document.getElementById('saleClient').value || '';
+  const statut = document.getElementById('salePaye').value;
+  sales.push({id:uid(), lotId, clientId, statut, type:document.getElementById('saleType').value, date:document.getElementById('saleDate').value||today(), qty, prix, total:qty*prix});
+  DB.set(KEYS.sales, sales);
+  logAction(`Vente: ${qty} × ${document.getElementById('saleType').value} = ${qty*prix} (${statut})`);
+  const lot = lots.find(l=>l.id===lotId);
+  if(lot && document.getElementById('saleType').value==='poulet'){
+    lot.qtyActuelle = Math.max(0, lot.qtyActuelle - qty);
+    DB.set(KEYS.lots, lots);
+  }
+  ['saleQty','salePrix'].forEach(id=>document.getElementById(id).value='');
+  closeModal('modalSale'); renderAll();
+}
+document.addEventListener('change', (e)=>{
+  if(e.target.id==='saleType'){
+    document.getElementById('salePrix').value = e.target.value==='poulet' ? (settings.prixVentePoulet||'') : (settings.prixOeuf||'');
+  }
+  if(e.target.id==='saleLot' && document.getElementById('saleType').value==='poulet'){
+    const r = calcCoutRevient(e.target.value);
+    if(r){
+      const marge = settings.margeDefaut||30;
+      document.getElementById('salePrix').value = Math.round(r.coutUnitaire*(1+marge/100));
+    }
+  }
+});
+function renderSales(){
+  const totalQty = sales.reduce((s,v)=>s+v.qty,0);
+  const totalRev = sales.reduce((s,v)=>s+v.total,0);
+  document.getElementById('salesQty').textContent = fmt(totalQty);
+  document.getElementById('salesRevenu').textContent = fmt(totalRev)+' '+devise();
+  const wrap = document.getElementById('salesList');
+  const searchEl = document.getElementById('salesSearch');
+  const q = (searchEl ? searchEl.value : '').toLowerCase().trim();
+  let list = [...sales].reverse();
+  if(q){
+    list = list.filter(v=> (lotLabel(v.lotId)+' '+v.date+' '+(v.type||'')).toLowerCase().includes(q));
+  }
+  if(list.length===0){ wrap.innerHTML = '<div class="empty">Aucune vente trouvée.</div>'; return; }
+  wrap.innerHTML = list.map(v=>`
+    <div class="list-item">
+      <div><div class="li-main">${v.type==='poulet'?'🐔 Poulet vivant':'🥚 Œufs'} × ${v.qty} ${v.statut==='credit'?'⚠️ crédit':''}</div><div class="li-sub">${v.date} · ${lotLabel(v.lotId)}</div></div>
+      <div class="li-val">${fmt(v.total)} ${devise()}</div>
+    </div>`).join('');
+}
+
+// ==================== PESÉES / CROISSANCE ====================
+function openWeightModal(){ document.getElementById('weightDate').value = today(); fillLotSelects(); document.getElementById('modalWeight').classList.add('active'); }
+function saveWeight(){
+  const lotId = document.getElementById('weightLot').value;
+  const val = parseFloat(document.getElementById('weightVal').value)||0;
+  if(!lotId || val<=0){ alert("Sélectionne un lot et un poids valide."); return; }
+  weights.push({id:uid(), lotId, date:document.getElementById('weightDate').value||today(), poids:val});
+  DB.set(KEYS.weights, weights);
+  document.getElementById('weightVal').value='';
+  closeModal('modalWeight'); renderAll();
+}
+function svgLineChart(points, w, h, color){
+  if(points.length===0) return '<div class="empty">Aucune pesée enregistrée.</div>';
+  const maxY = Math.max(...points.map(p=>p.y)) * 1.15 || 1;
+  const minY = 0;
+  const stepX = points.length>1 ? (w-30)/(points.length-1) : 0;
+  const coords = points.map((p,i)=>{
+    const x = 25 + i*stepX;
+    const y = h-15 - ((p.y-minY)/(maxY-minY||1))*(h-30);
+    return `${x},${y}`;
+  });
+  const dots = points.map((p,i)=>{
+    const [x,y] = coords[i].split(',');
+    return `<circle cx="${x}" cy="${y}" r="3" fill="${color}"></circle><text x="${x}" y="${h-2}" font-size="7" text-anchor="middle" fill="#6c757d">${p.label}</text>`;
+  }).join('');
+  return `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}">
+    <polyline points="${coords.join(' ')}" fill="none" stroke="${color}" stroke-width="2"/>
+    ${dots}
+  </svg>`;
+}
+function renderGrowthCharts(){
+  const wrap = document.getElementById('growthCharts');
+  if(!wrap) return;
+  if(lots.length===0){ wrap.innerHTML = '<div class="empty">Ajoute un lot puis enregistre des pesées.</div>'; return; }
+  wrap.innerHTML = lots.map(lot=>{
+    const pts = weights.filter(w=>w.lotId===lot.id).sort((a,b)=>a.date.localeCompare(b.date))
+      .map(w=>({x:w.date, y:w.poids, label:w.date.slice(5)}));
+    return `<div class="chart-box"><div class="ctitle">${lot.type} — ${lot.date} (g)</div>${svgLineChart(pts, 320, 110, '#2d6a4f')}</div>`;
+  }).join('');
+}
+function svgBarChart(items, w, h){
+  if(items.length===0) return '<div class="empty">Pas encore de données.</div>';
+  const maxV = Math.max(...items.map(i=>Math.max(i.cout,i.revenu))) * 1.15 || 1;
+  const bw = (w-20)/items.length;
+  let bars = '';
+  items.forEach((it,i)=>{
+    const x = 10 + i*bw;
+    const hc = (it.cout/maxV)*(h-25);
+    const hr = (it.revenu/maxV)*(h-25);
+    bars += `<rect x="${x+2}" y="${h-15-hc}" width="${bw/2-4}" height="${hc}" fill="#d62828"/>`;
+    bars += `<rect x="${x+bw/2}" y="${h-15-hr}" width="${bw/2-4}" height="${hr}" fill="#2d6a4f"/>`;
+    bars += `<text x="${x+bw/2}" y="${h-3}" font-size="6.5" text-anchor="middle" fill="#6c757d">${it.label}</text>`;
+  });
+  return `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}">${bars}</svg>
+    <div style="font-size:0.68rem; color:var(--gris); margin-top:4px;">🟥 Coût &nbsp; 🟩 Revenu</div>`;
+}
+function renderProfitChart(){
+  const wrap = document.getElementById('profitChart');
+  if(!wrap) return;
+  const items = lots.map(lot=>{
+    const coutPoussins = lot.cout*lot.qtyInitiale;
+    const coutAlimentLot = feed.filter(f=>f.type==='sortie' && f.lotId===lot.id).reduce((s,f)=>s+f.cout,0);
+    const coutLot = coutPoussins + coutAlimentLot;
+    const revenuLot = sales.filter(s=>s.lotId===lot.id).reduce((s,v)=>s+v.total,0);
+    return {label: lot.type.slice(0,6)+' '+lot.date.slice(5), cout: coutLot, revenu: revenuLot};
+  });
+  wrap.innerHTML = `<div class="chart-box">${svgBarChart(items, 320, 130)}
+    <div style="font-size:0.68rem; color:var(--gris); margin-top:6px;">Coût = poussins/œufs + aliment distribué directement à ce lot. L'aliment du stock général non attribué n'est pas inclus ici.</div>
+  </div>`;
+}
+
+function renderActionsLog(){
+  const wrap = document.getElementById('actionsLog');
+  if(!wrap) return;
+  if(actions.length===0){ wrap.innerHTML = '<div class="empty">Aucune action enregistrée.</div>'; return; }
+  wrap.innerHTML = [...actions].reverse().slice(0,50).map(a=>`
+    <div class="list-item" style="padding:6px 10px;">
+      <div><div class="li-main" style="font-size:0.78rem;">${a.desc}</div><div class="li-sub">${new Date(a.date).toLocaleString('fr-FR')} · ${a.role}</div></div>
+    </div>`).join('');
+}
+
+// ==================== PARAMÈTRES ====================
+function loadSettingsForm(){
+  document.getElementById('setFarmName').value = settings.farmName;
+  document.getElementById('setCurrency').value = settings.currency;
+  document.getElementById('setPrixPoussin').value = settings.prixPoussin;
+  document.getElementById('setPrixAliment').value = settings.prixAliment;
+  document.getElementById('setPrixVentePoulet').value = settings.prixVentePoulet;
+  document.getElementById('setPrixOeuf').value = settings.prixOeuf;
+  document.getElementById('setMargeDefaut').value = settings.margeDefaut;
+  document.getElementById('raceTags').innerHTML = settings.races.map((r,i)=>
+    `<span class="race-tag">${r} <button onclick="removeRace(${i})">×</button></span>`).join('');
+  document.getElementById('setSecQuestion').value = settings.secQuestion||'';
+  document.getElementById('setSecAnswer').value = settings.secAnswer||'';
+}
+function saveSettings(){
+  settings.farmName = document.getElementById('setFarmName').value || 'Ferme Avicole Racine';
+  settings.currency = document.getElementById('setCurrency').value || 'FCFA';
+  settings.prixPoussin = parseFloat(document.getElementById('setPrixPoussin').value)||0;
+  settings.prixAliment = parseFloat(document.getElementById('setPrixAliment').value)||0;
+  settings.prixVentePoulet = parseFloat(document.getElementById('setPrixVentePoulet').value)||0;
+  settings.prixOeuf = parseFloat(document.getElementById('setPrixOeuf').value)||0;
+  settings.margeDefaut = parseFloat(document.getElementById('setMargeDefaut').value)||30;
+  DB.set(KEYS.settings, settings);
+  document.querySelector('header p').textContent = settings.farmName+" — savoirs endogènes & indépendance totale";
+  renderAll();
+  alert('Paramètres enregistrés.');
+}
+function addRace(){
+  const name = document.getElementById('newRaceName').value.trim();
+  if(!name) return;
+  if(!settings.races.includes(name)) settings.races.push(name);
+  DB.set(KEYS.settings, settings);
+  document.getElementById('newRaceName').value='';
+  loadSettingsForm();
+}
+function removeRace(i){
+  settings.races.splice(i,1);
+  DB.set(KEYS.settings, settings);
+  loadSettingsForm();
+}
+function savePins(){
+  const p = document.getElementById('setPinPatron').value;
+  const g = document.getElementById('setPinGerant').value;
+  if(p && p.length>=4) users.patron = p;
+  if(g && g.length>=4) users.gerant = g;
+  DB.set(KEYS.users, users);
+  document.getElementById('setPinPatron').value='';
+  document.getElementById('setPinGerant').value='';
+  alert('Codes PIN mis à jour.');
+}
+
+// ==================== EXPORT CSV & SAUVEGARDE ====================
+function downloadFile(filename, content, mime){
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function toCSV(rows){
+  return rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+}
+function exportCSV(type){
+  let rows = [];
+  if(type==='lots'){
+    rows = [['Race','Origine','Date','Qté initiale','Qté actuelle','Coût unitaire','Fournisseur']];
+    lots.forEach(l=>rows.push([l.type,l.source,l.date,l.qtyInitiale,l.qtyActuelle,l.cout,l.fournisseur||'']));
+  } else if(type==='feed'){
+    rows = [['Type','Date','Quantité (kg)','Coût','Lot','Notes']];
+    feed.forEach(f=>rows.push([f.type,f.date,f.qty,f.cout,f.lotId?lotLabel(f.lotId):'Stock général',f.notes||'']));
+  } else if(type==='health'){
+    rows = [['Type','Date','Lot','Description','Coût']];
+    health.forEach(h=>rows.push([h.type,h.date,lotLabel(h.lotId),h.desc,h.cout||0]));
+  } else if(type==='sales'){
+    rows = [['Type','Date','Lot','Quantité','Prix unitaire','Total']];
+    sales.forEach(v=>rows.push([v.type,v.date,lotLabel(v.lotId),v.qty,v.prix,v.total]));
+  }
+  downloadFile(`elevage_${type}_${today()}.csv`, toCSV(rows), 'text/csv;charset=utf-8');
+}
+function exportBackup(){
+  const data = { lots, feed, health, sales, weights, settings, users, clients, eggs, payments, actions, exportDate: new Date().toISOString() };
+  settings.lastBackup = today();
+  DB.set(KEYS.settings, settings);
+  downloadFile(`elevage_sauvegarde_${today()}.json`, JSON.stringify(data, null, 2), 'application/json');
+  document.getElementById('installBanner').style.display = 'none';
+}
+function restoreBackup(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!confirm('Ceci remplacera toutes les données actuelles. Continuer ?')) return;
+      lots = data.lots||[]; feed = data.feed||[]; health = data.health||[]; sales = data.sales||[];
+      weights = data.weights||[]; settings = data.settings||settings; users = data.users||users;
+      clients = data.clients||[]; eggs = data.eggs||[]; payments = data.payments||[]; actions = data.actions||[];
+      DB.set(KEYS.lots, lots); DB.set(KEYS.feed, feed); DB.set(KEYS.health, health);
+      DB.set(KEYS.sales, sales); DB.set(KEYS.weights, weights); DB.set(KEYS.settings, settings); DB.set(KEYS.users, users);
+      DB.set(KEYS.clients, clients); DB.set(KEYS.eggs, eggs); DB.set(KEYS.payments, payments); DB.set(KEYS.actions, actions);
+      alert('Sauvegarde restaurée avec succès.');
+      renderAll(); loadSettingsForm();
+    }catch(err){ alert('Fichier de sauvegarde invalide.'); }
+  };
+  reader.readAsText(file);
+}
+
+// ==================== DASHBOARD ====================
+function renderDashboard(){
+  const vivants = lots.reduce((s,l)=>s+l.qtyActuelle,0);
+  const mortalite = lots.reduce((s,l)=>s+(l.qtyInitiale-l.qtyActuelle),0);
+  const revenu = sales.reduce((s,v)=>s+v.total,0);
+  const coutLots = lots.reduce((s,l)=>s+l.cout*l.qtyInitiale,0);
+  const coutFeed = feed.reduce((s,f)=>s+(f.type==='entree'?f.cout:0),0);
+  const marge = revenu - coutLots - coutFeed;
+  document.getElementById('dashVivants').textContent = fmt(vivants);
+  document.getElementById('dashMortalite').textContent = fmt(mortalite);
+  document.getElementById('dashRevenu').textContent = fmt(revenu)+' '+devise();
+  document.getElementById('dashMarge').textContent = fmt(marge)+' '+devise();
+  const wrap = document.getElementById('dashLots');
+  if(lots.length===0){ wrap.innerHTML = '<div class="empty">Aucun lot. Appuie sur + pour commencer.</div>'; }
+  else {
+    wrap.innerHTML = lots.slice(-3).reverse().map(lot=>{
+      const s = stageInfo(lot);
+      const cls = isLocalRace(lot.type) ? 'local' : '';
+      return `<div class="lot-card ${cls}">
+        <div class="lot-header"><strong>${lot.type}</strong> — ${lot.qtyActuelle} têtes</div>
+        <div class="lot-meta">${s.label} · ${s.j} jours</div>
+        <div class="stage-bar"><div class="stage-fill" style="width:${s.pct}%"></div></div>
+      </div>`;
+    }).join('');
+  }
+  applyRoleRestrictions();
+}
+
+function renderAll(){
+  renderDashboard(); renderLots(); renderFeed(); renderHealth(); renderSales();
+  fillLotSelects(); fillClientSelect(); renderGrowthCharts(); renderProfitChart(); loadSettingsForm();
+  renderBestPractices(); renderEncyclo(); renderEggs(); renderClients(); renderVaccineAlerts(); renderActionsLog(); renderCoutRevient();
+  document.querySelector('header p').textContent = settings.farmName+" — savoirs endogènes & indépendance totale";
+}
+window.currentView = 'dashboard';
+
+// ==================== PWA / SERVICE WORKER ====================
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(err=>console.log('Erreur SW:', err));
+  });
+}
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('installBanner').style.display = 'block';
+});
+
+renderAll();
+</script>
+</body>
+</html>
